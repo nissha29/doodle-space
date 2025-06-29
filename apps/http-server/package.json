@@ -1,5 +1,5 @@
 {
-  "name": "http-backend",
+  "name": "http-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@repo/server-common": "workspace:*",
+    "@repo/common": "workspace:*",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10"
   }

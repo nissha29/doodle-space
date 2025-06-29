@@ -1,5 +1,5 @@
 {
-  "name": "ws-backend",
+  "name": "ws-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.2",
+    "typescript": "^5.8.3",
     "ws": "^8.18.2"
   },
   "keywords": [],
@@ -16,8 +17,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
     "@repo/server-common": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1"
   }

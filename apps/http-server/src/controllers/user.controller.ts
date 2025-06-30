@@ -1,41 +1,86 @@
-import { Request, Response } from "express"
-import jwt from 'jsonwebtoken'
-import { CreateUserSchema, signInSchema } from '@repo/common/types'
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { CreateUserSchema, signInSchema } from "@repo/common/types";
+import { prismaClient } from "@repo/prisma/client";
+import { generateToken } from "../utils/token.util.js";
+import { CustomRequest } from "../types/express.js";
+import bcrypt from "bcrypt";
+import { emitError, emitSuccess } from "../utils/response.util.js";
 
-const signup = (req: Request, res: Response) => {
-    const data = CreateUserSchema.safeParse(req.body);
-    if(! data.success){
-        return res.json({
-            message: `Incorrect inputs`
-        })
+const signup = async (req: CustomRequest, res: Response) => {
+  try {
+    const { error, data } = CreateUserSchema.safeParse(req.body);
+    if (error) {
+      emitError({ res, error: `Incorrect Inputs, ${error}`, statusCode: 400 });
+      return;
     }
 
-    res.json({
-        message: `User Signed up`
-    })
-}
-
-const signin = (req: Request, res: Response) => {
-    const data = signInSchema.safeParse(req.body);
-    if(! data.success){
-        return res.json({
-            message: `Incorrect inputs`
-        })
+    const { name, email, password } = data;
+    const existingUser = await prismaClient.user.findFirst({
+      where: { name, email },
+    });
+    if (existingUser) {
+      emitError({ res, error: `User already exists`, statusCode: 409 });
+      return;
     }
 
-    const userId = 'something';
-    const secret = process.env?.JWT_SECRET || '';
+    const hashedPass = await bcrypt.hash(password, 10);
+    const user = await prismaClient.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPass,
+      },
+    });
 
-    const token = jwt.sign({
-        userId
-    }, secret);
+    const token = generateToken(user.id);
+    emitSuccess({
+      res,
+      data: { token, user: { name: user.name, email: user.email } },
+      message: `You are signed up successfully`,
+    });
+    return;
+  } catch (error) {
+    emitError({ res, error: `Error while signing up, ${error}` });
+    return;
+  }
+};
 
-    res.json({
-        message: token
-    })
-}
+const signin = async (req: Request, res: Response) => {
+  try {
+    const { error, data } = CreateUserSchema.safeParse(req.body);
+    if (error) {
+      emitError({ res, error: `Incorrect Inputs, ${error}`, statusCode: 400 });
+      return;
+    }
 
-export {
-    signup,
-    signin
-}
+    const { email, password } = data;
+    const user = await prismaClient.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      emitError({ res, error: `User doesn't exists`, statusCode: 400 });
+      return;
+    }
+
+    const isPassValid = await bcrypt.compare(password, user.password);
+    if (!isPassValid) {
+      emitError({ res, error: `Incorrect Password`, statusCode: 400 });
+      return;
+    }
+
+    const token = generateToken(user.id);
+    emitSuccess({
+      res,
+      data: { token, user: { name: user.name, email: user.email } },
+      message: `You are signed in successfully`,
+    });
+    return;
+  } catch (error) {
+    emitError({ res, error: `Error while signing up, ${error}` });
+    return;
+  }
+};
+
+export { signup, signin };

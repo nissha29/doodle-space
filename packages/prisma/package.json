@@ -1,7 +1,11 @@
 {
-  "name": "prisma",
+  "name": "@repo/prisma",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
+  "exports":{
+    "./client": "./src/index.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,6 +17,7 @@
     "@repo/typescript-config": "workspace:*"
   },
   "dependencies": {
+    "@prisma/client": "6.10.1",
     "prisma": "^6.10.1"
   }
 }

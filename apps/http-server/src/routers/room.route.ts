@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createRoom } from "../controllers/createRoom.controller";
-import { auth } from "../middlewares/auth.middleware";
+import { createRoom } from "../controllers/createRoom.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
 
 const roomRouter = Router();
 

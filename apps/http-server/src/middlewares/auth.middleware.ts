@@ -1,21 +1,28 @@
-import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { CustomRequest } from "../types/express";
-import { JWT_SECRET } from '@repo/server-common/config'
+import { NextFunction, Response } from "express";
+import { CustomRequest } from "../types/express.js";
+import { emitError } from "../utils/response.util.js";
+import { verifyToken } from "../utils/token.util.js";
 
-export function auth(req: CustomRequest, res: Response, next: NextFunction){
-    const token = req.headers['authorization'] || '';
-    const secret = JWT_SECRET || '';
+export function auth(req: CustomRequest, res: Response, next: NextFunction) {
+  const token = req.headers["authorization"];
 
-    const decoded = jwt.verify(token, secret);
+  if (!token) {
+    emitError({ res, error: `token not provided` });
+    return;
+  }
 
-    if(decoded){
-        req.userId =  (decoded as JwtPayload).userId;
-        next();
-    }
-    else{
-        res.json({
-            message: 'You are not authorized',
-        })
-    }
+  const payload = verifyToken(token);
+
+  if(payload.error){
+    emitError({ res, error: `token not verified, ${payload.error}` });
+    return;
+  }
+
+  if (payload.decoded) {
+    req.userId = payload.decoded.userId;
+    next();
+  } else {
+    emitError({ res, error: `You are not authorized` });
+    return;
+  }
 }

@@ -4,9 +4,10 @@ import { Request, Response } from "express";
 const createRoom = (req: Request, res: Response) => {
     const data = CreateRoomSchema.safeParse(req.body);
     if (!data.success) {
-        return res.json({
+        res.json({
             message: `Incorrect inputs`
         })
+        return;
     }
     
     res.json({

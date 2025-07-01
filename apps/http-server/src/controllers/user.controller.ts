@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { CreateUserSchema, signInSchema } from "@repo/common/types";
 import { prismaClient } from "@repo/prisma/client";
 import { generateToken } from "../utils/token.util.js";
-import { CustomRequest } from "../types/express.js";
 import bcrypt from "bcrypt";
 import { emitError, emitSuccess } from "../utils/response.util.js";
 
-const signup = async (req: CustomRequest, res: Response) => {
+const signup = async (req: Request, res: Response) => {
   try {
     const { error, data } = CreateUserSchema.safeParse(req.body);
     if (error) {
@@ -34,6 +32,11 @@ const signup = async (req: CustomRequest, res: Response) => {
     });
 
     const token = generateToken(user.id);
+    if(token?.error){
+      emitError({ res, error: `${token.error}`, statusCode: 400 });
+      return;
+    }
+
     emitSuccess({
       res,
       data: { token, user: { name: user.name, email: user.email } },
@@ -48,7 +51,7 @@ const signup = async (req: CustomRequest, res: Response) => {
 
 const signin = async (req: Request, res: Response) => {
   try {
-    const { error, data } = CreateUserSchema.safeParse(req.body);
+    const { error, data } = signInSchema.safeParse(req.body);
     if (error) {
       emitError({ res, error: `Incorrect Inputs, ${error}`, statusCode: 400 });
       return;
@@ -71,6 +74,11 @@ const signin = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(user.id);
+    if(token?.error){
+      emitError({ res, error: `${token.error}`, statusCode: 400 });
+      return;
+    }
+    
     emitSuccess({
       res,
       data: { token, user: { name: user.name, email: user.email } },
@@ -78,7 +86,7 @@ const signin = async (req: Request, res: Response) => {
     });
     return;
   } catch (error) {
-    emitError({ res, error: `Error while signing up, ${error}` });
+    emitError({ res, error: `Error while signing in, ${error}` });
     return;
   }
 };

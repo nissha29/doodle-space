@@ -9,17 +9,17 @@
     "dev": "pnpm run build && pnpm run start"
   },
   "dependencies": {
+    "@repo/prisma": "workspace:*",
+    "dotenv": "^17.0.0",
     "jsonwebtoken": "^9.0.2",
     "typescript": "^5.8.3",
-    "ws": "^8.18.2",
-    "@repo/prisma": "workspace:*"
+    "ws": "^8.18.2"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@repo/server-common": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1"

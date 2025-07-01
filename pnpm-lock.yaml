@@ -42,9 +42,6 @@ importers:
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@repo/server-common':
-        specifier: workspace:*
-        version: link:../../packages/server-common
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -103,6 +100,9 @@ importers:
       '@repo/prisma':
         specifier: workspace:*
         version: link:../../packages/prisma
+      dotenv:
+        specifier: ^17.0.0
+        version: 17.0.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -113,9 +113,6 @@ importers:
         specifier: ^8.18.2
         version: 8.18.2
     devDependencies:
-      '@repo/server-common':
-        specifier: workspace:*
-        version: link:../../packages/server-common
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -177,19 +174,12 @@ importers:
       '@prisma/client':
         specifier: 6.10.1
         version: 6.10.1(prisma@6.10.1(typescript@5.8.3))(typescript@5.8.3)
-      prisma:
-        specifier: ^6.10.1
-        version: 6.10.1(typescript@5.8.3)
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-
-  packages/server-common:
-    dependencies:
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
+      prisma:
+        specifier: ^6.10.1
+        version: 6.10.1(typescript@5.8.3)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*

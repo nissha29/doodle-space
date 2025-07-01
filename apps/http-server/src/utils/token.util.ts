@@ -1,14 +1,18 @@
-import { JWT_SECRET } from '@repo/server-common/config';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const secret = process.env.JWT_SECRET;
 
 export function generateToken(userId: string) {
     try {
-        if (!JWT_SECRET || typeof JWT_SECRET !== 'string') {
+        console.log(secret);
+        if (!secret) {
             return { error: 'secret not provided' };
         }
 
-        const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
-        return { token };
+        const encoded = jwt.sign({ userId }, secret, { expiresIn: '1h' });
+        return { encoded };
 
     } catch (error) {
         console.error('Error while generating token', error);
@@ -22,11 +26,11 @@ export function verifyToken(token: string) {
             return { error: `token not provided` }
         }
 
-        if (!JWT_SECRET || typeof JWT_SECRET !== 'string') {
+        if (!secret) {
             return {  error: 'secret not provided' };
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, secret);
         if (typeof decoded === 'string') {
             return { error: 'invalid token payload' };
         }

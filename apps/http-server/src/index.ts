@@ -1,14 +1,18 @@
-import express from 'express';
+import express from 'express'
+import userRouter from './routers/user.route.js';
+import roomRouter from './routers/room.route.js';
 import dotenv from 'dotenv'
 
 const app = express();
+app.use(express.json());
 dotenv.config();
 
-app.get('/', ({ req, res}: any) => {
-    return res.json({
-        message: `Hello World`
-    })
+app.get('/', (req, res) => {
+    res.json({ message: `Hello World` })
 })
+
+app.use('/user', userRouter);
+app.use('/room', roomRouter);
 
 app.listen(8000, () => {
     console.log(`Server Started`)

@@ -1,18 +1,41 @@
 import { CreateRoomSchema } from "@repo/common/types";
-import { Request, Response } from "express";
+import { Response } from "express";
+import { emitError, emitSuccess } from "../utils/response.util.js";
+import { CustomRequest } from "../types/express.js";
+import { prismaClient } from "@repo/prisma/client";
 
-const createRoom = (req: Request, res: Response) => {
-    const data = CreateRoomSchema.safeParse(req.body);
-    if (!data.success) {
-        res.json({
-            message: `Incorrect inputs`
+const createRoom = async(req: CustomRequest, res: Response) => {
+    try {
+        const { error, data } = CreateRoomSchema.safeParse(req.body);
+        if (error) {
+            emitError({ res, error: `Incorrect Inputs, ${error}`, statusCode: 400 });
+            return;
+        }
+
+        if (!req.userId) {
+            emitError({ res, error: `You are not authorized`, statusCode: 400 });
+            return;
+        }
+
+        const { slug } = data;
+
+        const room = await prismaClient.room.create({
+            data: {
+                slug,
+                adminId: req.userId,
+            }
         })
+
+        emitSuccess({
+            res,
+            data: { room },
+            message: `Room created successfully`,
+        });
+        return;
+    } catch (error) {
+        emitError({ res, error: `Error while creating room, ${error}` });
         return;
     }
-    
-    res.json({
-        message: `Room Created`
-    })
 }
 
 export {

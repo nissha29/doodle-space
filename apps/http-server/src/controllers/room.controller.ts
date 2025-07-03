@@ -57,15 +57,39 @@ const roomChats = async(req: CustomRequest, res: Response) => {
         emitSuccess({
             res,
             data: { chats },
-            message: `Room created successfully`,
+            message: `Chats fetched successfully`,
         });
     }catch(error){
-        emitError({ res, error: `Error while creating room, ${error}` });
+        emitError({ res, error: `Error while fetching room chats, ${error}` });
+        return;
+    }
+}
+
+const roomIdBySlug = async(req: CustomRequest, res: Response) => {
+    try{
+        const slug = req.params.slug;
+        if(! slug){
+            emitError({ res, error: `No room found with particular slug`, statusCode: 400 });
+            return;
+        }
+
+        const room = await prismaClient.room.findUnique({
+            where: { slug, },
+        })
+
+        emitSuccess({
+            res,
+            data: { roomId: room?.id },
+            message: `roomId fetched successfully`,
+        });
+    }catch(error){
+        emitError({ res, error: `Error while searching room by slug, ${error}` });
         return;
     }
 }
 
 export {
     createRoom,
-    roomChats
+    roomChats,
+    roomIdBySlug
 }

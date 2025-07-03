@@ -2,6 +2,8 @@ import { IUser } from "./types/types.js";
 import WebSocket from "ws";
 import { prismaClient } from '@repo/prisma/client'
 
+// have to optimise the TC from O(n) to O(1) for user array traversing, create maps --------------------------------------
+// also add other checks here for validations
 const users: IUser[] = [];
 
 const addNewConnection = (ws: WebSocket, userId: string, username: string) => {
@@ -10,7 +12,7 @@ const addNewConnection = (ws: WebSocket, userId: string, username: string) => {
 
 const roomExists = async (roomId: number) => {
     try {
-        if(! roomId || typeof(roomId) !== 'number'){
+        if (!roomId || typeof (roomId) !== 'number') {
             return false;
         }
         const room = await prismaClient.room.findFirst({
@@ -57,10 +59,20 @@ const leaveRoom = async (userId: string, roomId: number) => {
     user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
 }
 
-const sendChatToRoom = async (message: string, roomId: number) => {
+const sendChatToRoom = async (userId: string, message: string, roomId: number) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`);
     }
+
+    // use queues here, otherwise it will take long time to broadcast messages coz first it will put the message in DB then broadcast ---------------------------------
+    await prismaClient.chat.create({
+        data: {
+            roomId,
+            userId,
+            message,
+        }
+    })
+    // -------------------------------
 
     users.forEach(user => {
         if (user.rooms.includes(roomId)) {

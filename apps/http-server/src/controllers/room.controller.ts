@@ -38,6 +38,34 @@ const createRoom = async(req: CustomRequest, res: Response) => {
     }
 }
 
+const roomChats = async(req: CustomRequest, res: Response) => {
+    try{
+        const roomId = Number(req.params.roomId);
+        if(! roomId){
+            emitError({ res, error: `Room not found`, statusCode: 400 });
+            return;
+        }
+
+        const chats = await prismaClient.chat.findMany({
+            where: { roomId: roomId },
+            take: 50,
+            orderBy: {
+                id: "desc"
+            }
+        })
+
+        emitSuccess({
+            res,
+            data: { chats },
+            message: `Room created successfully`,
+        });
+    }catch(error){
+        emitError({ res, error: `Error while creating room, ${error}` });
+        return;
+    }
+}
+
 export {
-    createRoom
+    createRoom,
+    roomChats
 }

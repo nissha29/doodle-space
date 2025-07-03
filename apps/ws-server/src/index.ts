@@ -15,40 +15,43 @@ wss.on('connection', async function connection(ws, request) {
   const token = queryParams.get('token') || '';
 
   const userId = authUser(token);
-  if(! userId){
+  if (!userId) {
     ws.close();
     return;
   }
-
   const user = await prismaClient.user.findFirst({
     where: { id: userId }
   })
-  if(! user){
+  if (!user) {
     ws.close();
     return;
   }
-  
+
   addNewConnection(ws, userId, user?.name);
 
   ws.on('message', function message(data) {
-    const parsedData = JSON.parse(data as unknown as string);
-  
-    switch (parsedData.type){
-      
-      case MessageType.joinRoom: 
-        joinRoom(userId, parsedData.roomId);
-        break;
+    try {
+      const parsedData = JSON.parse(data as unknown as string);
 
-      case MessageType.leaveRoom: 
-        leaveRoom(userId, parsedData.roomId);
-        break;
+      switch (parsedData.type) {
 
-      case MessageType.chat:
-        sendChatToRoom(parsedData.message, parsedData.roomId);
-        break;
+        case MessageType.joinRoom:
+          joinRoom(userId, parsedData.roomId);
+          break;
 
-      default:
-        console.error('Unknown message type received');
+        case MessageType.leaveRoom:
+          leaveRoom(userId, parsedData.roomId);
+          break;
+
+        case MessageType.chat:
+          sendChatToRoom(userId, parsedData.message, parsedData.roomId);
+          break;
+
+        default:
+          console.error('Unknown message type received');
+      }
+    } catch (error) {
+      console.log(`Incorrect payload, ${error}`);
     }
   });
 });

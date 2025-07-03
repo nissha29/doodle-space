@@ -11,7 +11,7 @@ export function generateToken(userId: string) {
             return { error: 'secret not provided' };
         }
 
-        const encoded = jwt.sign({ userId }, secret, { expiresIn: '1h' });
+        const encoded = jwt.sign({ userId }, secret, { expiresIn: '10d' });
         return { encoded };
 
     } catch (error) {

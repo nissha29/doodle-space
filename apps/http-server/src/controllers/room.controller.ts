@@ -28,7 +28,7 @@ const createRoom = async(req: CustomRequest, res: Response) => {
 
         emitSuccess({
             res,
-            data: { room },
+            result: { room },
             message: `Room created successfully`,
         });
         return;
@@ -42,6 +42,7 @@ const roomChats = async(req: CustomRequest, res: Response) => {
     try{
         const roomId = Number(req.params.roomId);
         if(! roomId){
+            console.log('room not found')
             emitError({ res, error: `Room not found`, statusCode: 400 });
             return;
         }
@@ -50,13 +51,13 @@ const roomChats = async(req: CustomRequest, res: Response) => {
             where: { roomId: roomId },
             take: 50,
             orderBy: {
-                id: "desc"
-            }
+                id: "asc"
+            },
         })
 
         emitSuccess({
             res,
-            data: { chats },
+            result: { chats: chats },
             message: `Chats fetched successfully`,
         });
     }catch(error){
@@ -73,13 +74,13 @@ const roomIdBySlug = async(req: CustomRequest, res: Response) => {
             return;
         }
 
-        const room = await prismaClient.room.findUnique({
+        const room = await prismaClient.room.findFirst({
             where: { slug, },
         })
-
+    
         emitSuccess({
             res,
-            data: { roomId: room?.id },
+            result: { roomId: room?.id },
             message: `roomId fetched successfully`,
         });
     }catch(error){

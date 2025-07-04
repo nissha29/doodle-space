@@ -39,7 +39,7 @@ const signup = async (req: Request, res: Response) => {
 
     emitSuccess({
       res,
-      data: { token, user: { name: user.name, email: user.email } },
+      result: { token, user: { name: user.name, email: user.email } },
       message: `You are signed up successfully`,
     });
     return;
@@ -81,7 +81,7 @@ const signin = async (req: Request, res: Response) => {
     
     emitSuccess({
       res,
-      data: { token, user: { name: user.name, email: user.email } },
+      result: { token, user: { name: user.name, email: user.email } },
       message: `You are signed in successfully`,
     });
     return;

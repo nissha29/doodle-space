@@ -2,7 +2,7 @@ import { Response } from "express";
 
 interface ISuccess {
     res: Response,
-    data: any,
+    result: any,
     message: string,
     statusCode?: number,
 }
@@ -13,8 +13,8 @@ interface IError {
     statusCode?: number,
 }
 
-export function emitSuccess({ res, data, message, statusCode = 200 }: ISuccess) {
-    res.status(statusCode).json({ data, message })
+export function emitSuccess({ res, result, message, statusCode = 200 }: ISuccess) {
+    res.status(statusCode).json({ result, message })
 }
 
 export function emitError({ res, error, statusCode = 500 }: IError) {

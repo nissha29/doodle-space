@@ -41,6 +41,7 @@ const joinRoom = async (userId: string, roomId: number) => {
     }
     user?.rooms.push(roomId);
     user.ws.send(JSON.stringify({
+        type: 'joinRoom',
         message: `${user.username} Room joined successfully`
     }))
 }

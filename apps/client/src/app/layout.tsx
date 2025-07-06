@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, EB_Garamond } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +30,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${ebGaramond.className} antialiased`}
-      >
+      <body className={`${ebGaramond.className} antialiased`}>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              border: "1px solid #737373",
+              background: "#ffffff",
+              color: "#000000",
+            },
+          }}
+        />
         {children}
       </body>
     </html>

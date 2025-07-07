@@ -5,7 +5,7 @@ import { verifyToken } from "../utils/token.util.js";
 
 export function auth(req: CustomRequest, res: Response, next: NextFunction) {
   const token = req.headers["authorization"];
-
+  
   if (!token) {
     emitError({ res, error: `token not provided` });
     return;

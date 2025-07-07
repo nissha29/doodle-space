@@ -36,7 +36,7 @@ export default function Signup() {
     const response = await signup(userData);
     localStorage.setItem('token', response.token.encoded);
     toast.success('Your account has been created successfully. Start doodling your ideas now!');
-    router.push('/canvas');
+    router.push('/canvas/123');
     }catch(error: any){
       toast.error(error.message || "Oops! Something went wrong during signin. Please check your details and try again.")
     }finally{

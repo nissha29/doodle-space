@@ -23,3 +23,17 @@ export const signin = async (userData: { email: string, password: string }) => {
         throw new Error(err.response?.data.error || 'Signin failed');
     }
 }
+
+export const verifyUser = async(token: string) => {
+    try {
+        const response = await axios.post(`${HTTP_URL}/user/me`, {}, {
+            headers: {
+                authorization: token,
+            }
+        });
+        return response.data.result;
+    } catch (error) {
+        const err = error as AxiosError<{ error: string }>;
+        throw new Error(err.response?.data.error || 'Unauthenticated user');
+    }
+}

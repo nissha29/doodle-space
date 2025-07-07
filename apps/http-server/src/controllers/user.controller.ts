@@ -4,6 +4,7 @@ import { prismaClient } from "@repo/prisma/client";
 import { generateToken } from "../utils/token.util.js";
 import bcrypt from "bcrypt";
 import { emitError, emitSuccess } from "../utils/response.util.js";
+import { CustomRequest } from "../types/express.js";
 
 const signup = async (req: Request, res: Response) => {
   try {
@@ -91,4 +92,26 @@ const signin = async (req: Request, res: Response) => {
   }
 };
 
-export { signup, signin };
+const me = async(req: CustomRequest, res: Response) => {
+  const userId = req.userId;
+  
+  const user = await prismaClient.user.findFirst({
+    where: {
+      id: userId,
+    }
+  });
+
+  if(! user){
+    emitError({ res, error: 'User not found', statusCode: 404 });
+    return;
+  }
+
+  emitSuccess({
+    res,
+    result: { user: { name: user.name, email: user.email, avatar: user.avatar } },
+    message: 'User data has been sent successfully'
+  });
+  return;
+}
+
+export { signup, signin, me };

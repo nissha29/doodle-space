@@ -6,7 +6,6 @@ const secret = process.env.JWT_SECRET;
 
 export function generateToken(userId: string) {
     try {
-        console.log(secret);
         if (!secret) {
             return { error: 'secret not provided' };
         }

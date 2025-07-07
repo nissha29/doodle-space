@@ -33,9 +33,9 @@ export default function Signin() {
         password: data.password,
       };
       const response = await signin(userData);
-      localStorage.setItem("token", response.token);
+      localStorage.setItem("token", response.token.encoded);
       toast.success("Signed in successfully! Let’s get creative with your doodles.");
-      router.push('/canvas');
+      router.push('/canvas/123');
     } catch (error: any) {
       toast.error(error.message || "Oops! Something went wrong during signin. Please check your details and try again."
       );

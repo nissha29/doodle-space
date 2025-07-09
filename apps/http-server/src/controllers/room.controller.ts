@@ -4,7 +4,7 @@ import { emitError, emitSuccess } from "../utils/response.util.js";
 import { CustomRequest } from "../types/express.js";
 import { prismaClient } from "@repo/prisma/client";
 
-const createRoom = async(req: CustomRequest, res: Response) => {
+const createRoom = async (req: CustomRequest, res: Response) => {
     try {
         const { error, data } = CreateRoomSchema.safeParse(req.body);
         if (error) {
@@ -38,16 +38,25 @@ const createRoom = async(req: CustomRequest, res: Response) => {
     }
 }
 
-const roomChats = async(req: CustomRequest, res: Response) => {
-    try{
+const roomShapes = async (req: CustomRequest, res: Response) => {
+    try {
         const roomId = Number(req.params.roomId);
-        if(! roomId){
+        if (!roomId) {
+            emitError({ res, error: `No room`, statusCode: 400 });
+            return;
+        }
+
+        const isRoom = await prismaClient.room.findFirst({
+            where: { id: roomId }
+        });
+
+        if (!isRoom) {
             console.log('room not found')
             emitError({ res, error: `Room not found`, statusCode: 400 });
             return;
         }
 
-        const chats = await prismaClient.chat.findMany({
+        const shapes = await prismaClient.chat.findMany({
             where: { roomId: roomId },
             take: 50,
             orderBy: {
@@ -57,19 +66,19 @@ const roomChats = async(req: CustomRequest, res: Response) => {
 
         emitSuccess({
             res,
-            result: { chats: chats },
-            message: `Chats fetched successfully`,
+            result: { shapes: shapes },
+            message: `Shapes fetched successfully`,
         });
-    }catch(error){
-        emitError({ res, error: `Error while fetching room chats, ${error}` });
+    } catch (error) {
+        emitError({ res, error: `Error while fetching room Shapes, ${error}` });
         return;
     }
 }
 
-const roomIdBySlug = async(req: CustomRequest, res: Response) => {
-    try{
+const roomIdBySlug = async (req: CustomRequest, res: Response) => {
+    try {
         const slug = req.params.slug;
-        if(! slug){
+        if (!slug) {
             emitError({ res, error: `No room found with particular slug`, statusCode: 400 });
             return;
         }
@@ -77,13 +86,13 @@ const roomIdBySlug = async(req: CustomRequest, res: Response) => {
         const room = await prismaClient.room.findFirst({
             where: { slug, },
         })
-    
+
         emitSuccess({
             res,
             result: { roomId: room?.id },
             message: `roomId fetched successfully`,
         });
-    }catch(error){
+    } catch (error) {
         emitError({ res, error: `Error while searching room by slug, ${error}` });
         return;
     }
@@ -91,6 +100,6 @@ const roomIdBySlug = async(req: CustomRequest, res: Response) => {
 
 export {
     createRoom,
-    roomChats,
+    roomShapes,
     roomIdBySlug
 }

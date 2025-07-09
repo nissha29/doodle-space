@@ -1,10 +1,8 @@
 import { HTTP_URL } from '@/config';
-import { IError } from '@/types/types';
 import axios, { AxiosError } from 'axios';
 
 
 export const signup = async (userData: { name: string, email: string, password: string }) => {
-    console.log(HTTP_URL)
     try {
         const response = await axios.post(`${HTTP_URL}/user/signup`, userData);
         return response.data.result;

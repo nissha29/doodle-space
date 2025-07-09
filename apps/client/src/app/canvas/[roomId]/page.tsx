@@ -1,12 +1,13 @@
-"use client";
-
 import Canvas from "@/components/canvas/canvas";
 import ProtectedRoute from "@/components/guards/ProtectedRoute";
 
-export default function CanvasPage() {
+export default async function CanvasPage({ params }: { params: { roomId: string }}) {
+  const param = await params;
+  const roomId = Number(param.roomId);
+  
   return (
     <ProtectedRoute>
-      <Canvas />
+      <Canvas roomId={roomId}/>
     </ProtectedRoute>
   );
 }

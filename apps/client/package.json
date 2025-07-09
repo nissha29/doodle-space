@@ -21,7 +21,8 @@
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "roughjs": "^4.6.6",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@repo/common": "workspace:*",

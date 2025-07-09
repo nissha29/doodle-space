@@ -11,6 +11,7 @@ import Error from "../forms/error";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { signin } from "@/api/auth";
+import Link from "next/link";
 
 type signinForm = z.infer<typeof signInSchema>;
 
@@ -45,7 +46,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="flex justify-center w-screen h-screen py-24 px-10">
+    <div className="flex flex-col justify-center items-center w-screen h-screen py-24 px-10">
       <div className="flex flex-col gap-5 items-start w-sm">
         <div className="text-3xl sm:text-4xl text-white tracking-normal flex gap-2 justify-center items-center">
           Welcome to DoodleSpace <ArrowRight size={24} />
@@ -83,6 +84,7 @@ export default function Signin() {
           </Button>
         </form>
       </div>
+      <div className="text-xl mt-3 text-neutral-400">Don't have an account, <Link href={'/signup'} className="text-white hover:underline underline-offset-4">Sign up</Link></div>
     </div>
   );
 }

@@ -56,7 +56,7 @@ const roomShapes = async (req: CustomRequest, res: Response) => {
             return;
         }
 
-        const shapes = await prismaClient.chat.findMany({
+        const shapes = await prismaClient.shape.findMany({
             where: { roomId: roomId },
             take: 50,
             orderBy: {

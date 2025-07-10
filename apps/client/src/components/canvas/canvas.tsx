@@ -1,6 +1,7 @@
 "use client";
 
-import canvasInit from "@/canvasKit";
+import canvasInit from "@/canvasKit/canvasKit";
+import { clearCanvas } from "@/canvasKit/clearCanvas";
 import useLoadShapes from "@/hooks/useLoadShapes";
 import useSocket from "@/hooks/useSocket";
 import { useShapesStore } from "@/store/useShapesStore";
@@ -8,14 +9,21 @@ import { useEffect, useRef } from "react";
 
 export default function Canvas({ roomId }: { roomId: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { socket } = useSocket();
-  const shapesStore = useShapesStore();
+  const { socket } = useSocket(roomId);
+  const shapesStore = useShapesStore;
 
   const { isRoom } = useLoadShapes(roomId);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
     if (canvasRef.current && isRoom) {
-      canvasInit({ canvas: canvasRef.current, roomId: roomId, shapesStore });
+      canvasInit({
+        canvas: canvasRef.current,
+        roomId: roomId,
+        shapesStore,
+        socket,
+      });
     }
   }, [socket, roomId, canvasRef, isRoom]);
 

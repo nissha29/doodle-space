@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import { StoreApi, UseBoundStore } from "zustand";
 
 export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -32,5 +33,12 @@ export type ShapeStore = {
 export type CanvasInitParams  = {
   canvas: HTMLCanvasElement,
   roomId: number,
-  shapesStore: ShapeStore
+  shapesStore: UseBoundStore<StoreApi<ShapeStore>>,
+  socket: WebSocket | null
 }
+
+export type SocketStore = {
+  socket: WebSocket | null;
+  connect: (roomId: number, token: string) => void;
+  disconnect: () => void;
+};

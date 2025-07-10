@@ -60,17 +60,17 @@ const leaveRoom = async (userId: string, roomId: number) => {
     user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
 }
 
-const sendChatToRoom = async (userId: string, message: string, roomId: number) => {
+const sendChatToRoom = async (userId: string, shape: string, roomId: number) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`);
     }
 
     // use queues here, otherwise it will take long time to broadcast messages coz first it will put the message in DB then broadcast ---------------------------------
-    await prismaClient.chat.create({
+    await prismaClient.shape.create({
         data: {
             roomId,
             userId,
-            message,
+            shape,
         }
     })
     // -------------------------------
@@ -79,7 +79,7 @@ const sendChatToRoom = async (userId: string, message: string, roomId: number) =
         if (user.rooms.includes(roomId)) {
             user.ws.send(JSON.stringify({
                 type: 'chat',
-                message,
+                shape,
                 roomId,
             }))
         }

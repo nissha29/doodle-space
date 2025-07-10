@@ -1,23 +1,18 @@
-import { WS_URL } from "@/config";
-import { useEffect, useState } from "react";
+import { useSocketStore } from "@/store/useSocketStore";
+import { useEffect } from "react";
 
-export default function useSocket() {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+export default function useSocket(roomId: number) {
   const token = localStorage.getItem("token");
+  const socket = useSocketStore((s) => s.socket);
+  const connect = useSocketStore((s) => s.connect);
 
   useEffect(() => {
     if (!token) {
       console.log("no token");
-      setSocket(null);
       return;
     }
 
-    const ws = new WebSocket(`${WS_URL}?token=${token}`);
-
-    ws.onopen = () => {
-      console.log("connected");
-      setSocket(ws);
-    };
+    connect(roomId, token);
   }, []);
   return { socket };
 }

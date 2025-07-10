@@ -14,7 +14,7 @@ model User {
   password     String
   avatar       String?
   rooms        Room[]
-  chats        Chat[]
+  chats        Shape[]
 }
 
 model Room {
@@ -23,14 +23,14 @@ model Room {
   adminId      String
   createdAt    DateTime @default(now())
   admin        User @relation(fields: [adminId], references: [id])
-  chats        Chat[]
+  chats        Shape[]
 }
 
 // change the type of message, it should be Json which contains dimensions of different shapes like circle, rectangle etc
-model Chat {
+model Shape {
   id           Int @id @default(autoincrement())
   roomId       Int
-  message      String
+  shape        Json
   userId       String
   user         User @relation(fields: [userId], references: [id])
   room         Room @relation(fields: [roomId], references: [id])

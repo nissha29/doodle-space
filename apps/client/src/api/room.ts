@@ -16,10 +16,11 @@ export const getExistingShapes = async (roomId: number) => {
         console.log(response);
         const data = response.data.result.shapes;
 
-        const shapes = data.map((currShape: { message: string }) => {
-            const shape = JSON.parse(currShape.message);
+        const shapes = data.map((currShape: { shape: string }) => {
+            const shape = currShape.shape;
             return shape;
         });
+        console.log(shapes);
         return shapes;
     } catch (error) {
         const err = error as AxiosError<{ error: string }>;

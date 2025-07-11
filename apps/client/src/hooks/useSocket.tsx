@@ -7,6 +7,7 @@ export default function useSocket(roomId: number) {
   const connect = useSocketStore((s) => s.connect);
 
   useEffect(() => {
+    console.log('connecting here')
     if (!token) {
       console.log("no token");
       return;

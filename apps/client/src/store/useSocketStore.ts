@@ -8,14 +8,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         if (get().socket) return;
 
         const ws = new WebSocket(`${WS_URL}?token=${token}`);
-
+    
         ws.onopen = () => {
-            console.log("connected");
+            console.log(ws);
             set({ socket: ws });
-            ws.send(JSON.stringify({
-                type: 'joinRoom',
-                roomId: roomId,
-            }));
+            const data = JSON.stringify({
+                type: "joinRoom",
+                roomId
+            });
+            console.log(data);
+            ws.send(data);
         };
     },
     disconnect: () => {

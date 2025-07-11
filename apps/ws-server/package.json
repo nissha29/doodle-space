@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@repo/prisma": "workspace:*",
+    "@repo/common": "workspace:*",
     "dotenv": "^17.0.0",
     "jsonwebtoken": "^9.0.2",
     "typescript": "^5.8.3",

@@ -1,0 +1,44 @@
+"use client";
+
+import ProtectedRoute from "@/components/guards/ProtectedRoute";
+import SelectMode from "@/components/selectMode";
+import { useUserStore } from "@/store/useUserStore";
+
+export default function () {
+  const user = useUserStore((s) => s.user);
+  console.log(user);
+  return (
+    <ProtectedRoute>
+      <div className="px-5 lg:px-20 py-6 w-full h-full">
+        <div className="flex justify-between items-center">
+          <div className="text-2xl sm:text-3xl">
+            ძထძℓꫀ
+            <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">
+              ᦓραсꫀ
+            </span>
+          </div>
+          <div className="w-12 h-12 flex items-center justify-center bg-white rounded-full text-black text-2xl hover:cursor-pointer hover:scale-105">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+        <div className="flex justify-center items-center mt-28 flex-col">
+          <div className="flex justify-center items-center">
+            <div className="text-2xl sm:text-3xl font-semibold">ძƦ⩜Ꮤ, ძထძℓꫀ, ძꫀᦓℹ𝔤ᥒ</div>
+          </div>
+          <div className="flex flex-col border border-neutral-700 rounded-2xl mt-20 p-6 sm:p-12 bg-neutral-900/20">
+            <div className="text-2xl sm:text-3xl text-white mb-8">
+              Select Mode
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              <SelectMode type="draw" />
+              <SelectMode type="join" />
+              <SelectMode type="create" />
+              <SelectMode type="play" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}

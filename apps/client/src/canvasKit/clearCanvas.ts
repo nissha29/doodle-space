@@ -1,4 +1,5 @@
-import { Shape, ShapeStore } from "@/types/types";
+import { ShapeStore } from "@/types/types";
+import { Shape } from "@repo/common/types";
 import { StoreApi, UseBoundStore } from "zustand";
 
 export function clearCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, shapeStore: UseBoundStore<StoreApi<ShapeStore>>) {

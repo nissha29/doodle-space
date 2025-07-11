@@ -1,10 +1,9 @@
 import { clearCanvas } from "@/canvasKit/clearCanvas";
-import useSocket from "@/hooks/useSocket"
-import { Shape, ShapeStore } from "@/types/types";
+import { ShapeStore } from "@/types/types";
+import { Shape } from "@repo/common/types";
 import { StoreApi, UseBoundStore } from "zustand";
 
 export const receiveMessage = (roomId: number, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, shapeStore: UseBoundStore<StoreApi<ShapeStore>>,  socket: WebSocket | null) => {
-
     if (!socket) {
         console.log('No socket connection is there')
         return;
@@ -12,9 +11,9 @@ export const receiveMessage = (roomId: number, canvas: HTMLCanvasElement, ctx: C
 
     socket.onmessage = (event) => {
         const parsedMessage = JSON.parse(event.data);
+        console.log(parsedMessage);
         if (parsedMessage.type === 'chat') {
-            const parsedShape = JSON.parse(parsedMessage.shape);
-            shapeStore.getState().addShape(parsedShape);
+            shapeStore.getState().addShape(parsedMessage.shape);
             clearCanvas(canvas, ctx, shapeStore);
         }
     }

@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { signin } from "@/api/auth";
 import Link from "next/link";
+import { useUserStore } from "@/store/useUserStore";
 
 type signinForm = z.infer<typeof signInSchema>;
 
@@ -34,9 +35,10 @@ export default function Signin() {
         password: data.password,
       };
       const response = await signin(userData);
+      useUserStore.getState().setUser({ name: response.user.name, email: response.user.email });
       localStorage.setItem("token", response.token.encoded);
       toast.success("Signed in successfully! Let’s get creative with your doodles.");
-      router.push('/canvas/123');
+      router.push('/draw-mode');
     } catch (error: any) {
       toast.error(error.message || "Oops! Something went wrong during signin. Please check your details and try again."
       );

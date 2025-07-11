@@ -127,6 +127,9 @@ importers:
 
   apps/ws-server:
     dependencies:
+      '@repo/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@repo/prisma':
         specifier: workspace:*
         version: link:../../packages/prisma

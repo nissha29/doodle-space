@@ -31,12 +31,14 @@ wss.on('connection', async function connection(ws, request) {
 
   ws.on('message', function message(data) {
     try {
+      console.log('RAW MESSAGE:', data);
       const parsedData = JSON.parse(data as unknown as string);
       console.log(parsedData);
 
       switch (parsedData.type) {
 
         case MessageType.joinRoom:
+          console.log('join message receiving')
           joinRoom(userId, parsedData.roomId);
           break;
 
@@ -45,6 +47,7 @@ wss.on('connection', async function connection(ws, request) {
           break;
 
         case MessageType.chat:
+          console.log('chat message receiving')
           sendChatToRoom(userId, parsedData.shape, parsedData.roomId);
           break;
 

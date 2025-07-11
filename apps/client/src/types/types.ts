@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
+import { Shape } from "@repo/common/types";
 
 export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -9,19 +10,6 @@ export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 export interface IInput extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   className: string;
-}
-
-export type Shape = {
-  type: 'rect',
-  x: number,
-  y: number,
-  width: number,
-  height: number
-} | {
-  type: 'circle',
-  radius: number,
-  centreX: number,
-  centreY: number
 }
 
 export type ShapeStore = {
@@ -41,4 +29,15 @@ export type SocketStore = {
   socket: WebSocket | null;
   connect: (roomId: number, token: string) => void;
   disconnect: () => void;
+};
+
+export type User = {
+  name: string;
+  email: string;
+};
+
+export type UserStore = {
+  user: User | null;
+  setUser: (user: User) => void;
+  clearUser: () => void;
 };

@@ -1,4 +1,5 @@
-import { CanvasInitParams, Shape } from "@/types/types";
+import { CanvasInitParams } from "@/types/types";
+import { Shape } from "@repo/common/types";
 import { clearCanvas } from "./clearCanvas";
 import { receiveMessage, sendMessage } from "@/socket-handlers/init";
 
@@ -9,8 +10,8 @@ export default async function canvasInit({ canvas, roomId, shapesStore, socket }
         return;
     }
 
-    receiveMessage(roomId, canvas, ctx, shapesStore, socket)
     clearCanvas(canvas, ctx, shapesStore);
+    receiveMessage(roomId, canvas, ctx, shapesStore, socket);
 
     let clicked = false;
     let startX = 0;

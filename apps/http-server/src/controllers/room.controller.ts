@@ -8,7 +8,7 @@ const createRoom = async (req: CustomRequest, res: Response) => {
     try {
         const { error, data } = CreateRoomSchema.safeParse(req.body);
         if (error) {
-            emitError({ res, error: `Incorrect Inputs, ${error}`, statusCode: 400 });
+            emitError({ res, error: `Missing Link Id, ${error}`, statusCode: 400 });
             return;
         }
 
@@ -17,12 +17,10 @@ const createRoom = async (req: CustomRequest, res: Response) => {
             return;
         }
 
-        const { slug } = data;
-
         const room = await prismaClient.room.create({
             data: {
-                slug,
                 adminId: req.userId,
+                linkId: data.linkId
             }
         })
 
@@ -75,31 +73,7 @@ const roomShapes = async (req: CustomRequest, res: Response) => {
     }
 }
 
-const roomIdBySlug = async (req: CustomRequest, res: Response) => {
-    try {
-        const slug = req.params.slug;
-        if (!slug) {
-            emitError({ res, error: `No room found with particular slug`, statusCode: 400 });
-            return;
-        }
-
-        const room = await prismaClient.room.findFirst({
-            where: { slug, },
-        })
-
-        emitSuccess({
-            res,
-            result: { roomId: room?.id },
-            message: `roomId fetched successfully`,
-        });
-    } catch (error) {
-        emitError({ res, error: `Error while searching room by slug, ${error}` });
-        return;
-    }
-}
-
 export {
     createRoom,
     roomShapes,
-    roomIdBySlug
 }

@@ -108,7 +108,7 @@ const me = async(req: CustomRequest, res: Response) => {
 
   emitSuccess({
     res,
-    result: { user: { name: user.name, email: user.email, avatar: user.avatar } },
+    result: { user: { name: user.name, email: user.email } },
     message: 'User data has been sent successfully'
   });
   return;

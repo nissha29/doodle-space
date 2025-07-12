@@ -8,30 +8,28 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(uuid())
-  name         String
-  email        String @unique
-  password     String
-  avatar       String?
-  rooms        Room[]
-  chats        Shape[]
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  rooms    Room[]
+  shapes   Shape[]
 }
 
 model Room {
-  id           Int @id @default(autoincrement())
-  slug         String @unique
-  adminId      String
-  createdAt    DateTime @default(now())
-  admin        User @relation(fields: [adminId], references: [id])
-  chats        Shape[]
+  id        Int      @id @default(autoincrement())
+  linkId    String   @unique
+  adminId   String
+  createdAt DateTime @default(now())
+  admin     User     @relation(fields: [adminId], references: [id])
+  shapes    Shape[]
 }
 
-// change the type of message, it should be Json which contains dimensions of different shapes like circle, rectangle etc
 model Shape {
-  id           Int @id @default(autoincrement())
-  roomId       Int
-  shape        Json
-  userId       String
-  user         User @relation(fields: [userId], references: [id])
-  room         Room @relation(fields: [roomId], references: [id])
+  id     Int    @id @default(autoincrement())
+  roomId Int
+  shape  Json
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  room   Room   @relation(fields: [roomId], references: [id])
 }

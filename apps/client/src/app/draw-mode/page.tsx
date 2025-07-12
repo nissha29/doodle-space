@@ -1,12 +1,17 @@
 "use client";
 
 import ProtectedRoute from "@/components/guards/ProtectedRoute";
-import SelectMode from "@/components/selectMode";
+import SelectMode from "@/components/draw-mode/selectMode";
 import { useUserStore } from "@/store/useUserStore";
+import { useState } from "react";
+import JoinRoom from "@/components/draw-mode/joinRoom";
+import CreateRoom from "@/components/draw-mode/createRoom";
 
 export default function () {
   const user = useUserStore((s) => s.user);
-  console.log(user);
+  const [joinRoom, setJoinRoom] = useState(false);
+  const [createRoom, setCreateRoom] = useState(false);
+
   return (
     <ProtectedRoute>
       <div className="px-5 lg:px-20 py-6 w-full h-full">
@@ -31,13 +36,15 @@ export default function () {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-              <SelectMode type="draw" />
-              <SelectMode type="join" />
-              <SelectMode type="create" />
-              <SelectMode type="play" />
+              <SelectMode type="draw" href="/canvas"/>
+              <SelectMode type="join" onClick={() => setJoinRoom(true)}/>
+              <SelectMode type="create" onClick={() => setCreateRoom(true)}/>
+              <SelectMode type="play" href="/play"/>
             </div>
           </div>
         </div>
+        {joinRoom && <JoinRoom setJoinRoom={setJoinRoom}/>}
+        {createRoom && <CreateRoom setCreateRoom={setCreateRoom}/>}
       </div>
     </ProtectedRoute>
   );

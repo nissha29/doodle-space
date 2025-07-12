@@ -12,7 +12,7 @@ export const signInSchema = z.object({
 })
 
 export const CreateRoomSchema = z.object({
-    slug: z.string().min(3, { message: 'Name must be atleast 3 characters' }).max(40, { message: 'Name must be between 3 and 40 characters'}),
+    linkId: z.string(),
 })
 
 export type Shape = {

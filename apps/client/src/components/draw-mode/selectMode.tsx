@@ -121,19 +121,33 @@ export default function SelectMode({ type, href = "", onClick }: SelectModeProps
   const mode = modes[type];
   const IconComponent = mode.Icon;
 
-  return (
-    <Link href={"/canvas/123"} className="group" onClick={onClick}>
-      <div className="flex flex-col items-center p-6 rounded-xl border border-neutral-600 hover:border-neutral-500 transition-all duration-200 hover:bg-neutral-800/30">
-        <div className={`w-12 h-12 rounded-full ${mode.bgColor} flex items-center justify-center mb-4 ${mode.hoverBgColor} transition-colors`}>
-          <IconComponent />
-        </div>
-        <span className={`text-xl font-medium text-white ${mode.hoverTextColor} transition-colors`}>
-          {mode.text}
-        </span>
-        <span className="text-neutral-400 mt-2 text-center">
-          {mode.description}
-        </span>
+  const isNavigation = type === "draw" || type === "play";
+
+  const content = (
+    <div className="flex flex-col items-center p-6 rounded-xl border border-neutral-600 hover:border-neutral-500 transition-all duration-200 hover:bg-neutral-800/30">
+      <div className={`w-12 h-12 rounded-full ${mode.bgColor} flex items-center justify-center mb-4 ${mode.hoverBgColor} transition-colors`}>
+        <IconComponent />
       </div>
-    </Link>
+      <span className={`text-xl font-medium text-white ${mode.hoverTextColor} transition-colors`}>
+        {mode.text}
+      </span>
+      <span className="text-neutral-400 mt-2 text-center">
+        {mode.description}
+      </span>
+    </div>
+  );
+
+  if (isNavigation) {
+    return (
+      <Link href={href} className="group">
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" className="group bg-transparent border-none p-0" onClick={onClick}>
+      {content}
+    </button>
   );
 }

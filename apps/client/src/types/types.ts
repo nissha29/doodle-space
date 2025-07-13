@@ -41,3 +41,10 @@ export type UserStore = {
   setUser: (user: User) => void;
   clearUser: () => void;
 };
+export interface ICreate {
+    type: string, 
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number, 
+}

@@ -16,14 +16,20 @@ export const CreateRoomSchema = z.object({
 })
 
 export type Shape = {
-  type: 'rect',
-  x: number,
-  y: number,
-  width: number,
-  height: number
+    type: 'rectangle',
+    x1: number,
+    x2: number,
+    width: number,
+    height: number
 } | {
-  type: 'circle',
-  radius: number,
-  centreX: number,
-  centreY: number
+    type: 'line',
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+} | {
+    type: 'circle',
+    x: number,
+    y: number,
+    diameter: number
 }

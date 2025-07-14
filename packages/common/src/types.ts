@@ -22,14 +22,17 @@ export type Shape = {
     width: number,
     height: number
 } | {
+    type: 'circle',
+    x: number,
+    y: number,
+    diameter: number
+} | {
+    type: 'diamond',
+    diamondPoints: [number, number][]
+} | {
     type: 'line',
     x1: number,
     y1: number,
     x2: number,
     y2: number
-} | {
-    type: 'circle',
-    x: number,
-    y: number,
-    diameter: number
 }

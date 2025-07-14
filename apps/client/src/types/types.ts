@@ -18,7 +18,7 @@ export type ShapeStore = {
   setShapes: (shapes: Shape[]) => void;
 };
 
-export type CanvasInitParams  = {
+export type CanvasInitParams = {
   canvas: HTMLCanvasElement,
   roomId: number,
   shapesStore: UseBoundStore<StoreApi<ShapeStore>>,
@@ -41,10 +41,16 @@ export type UserStore = {
   setUser: (user: User) => void;
   clearUser: () => void;
 };
-export interface ICreate {
-    type: string, 
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number, 
+
+export interface ToolProps {
+  children: ReactNode;
+  isActive?: boolean;
+  onClick?: () => void;
+}
+
+export type ToolType = 'rectangle' | 'circle' | 'diamond' | 'arrow' | 'line' | 'pencil' | 'text' | 'eraser' | 'hand'
+
+export type ShapeTypeStore = {
+  activeTool: ToolType;
+  setActive: (shapeType: ToolType) => void;
 }

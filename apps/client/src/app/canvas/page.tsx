@@ -1,9 +1,22 @@
 "use client";
 
+import {
+  Arrow,
+  Circle,
+  Diamond,
+  Eraser,
+  Hand,
+  Line,
+  Pencil,
+  Rectangle,
+  Text,
+} from "@/icons/icons";
+import { useActiveStore } from "@/store/useActiveStore";
+import { ToolType } from "@/types/types";
 import { getDrawable } from "@/utils/getDrawable";
 import { makeShape } from "@/utils/makeShape";
 import { Shape } from "@repo/common/types";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import rough from "roughjs";
 
 const generator = rough.generator();
@@ -12,9 +25,10 @@ export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [drawing, setDrawing] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
-  const [type, setType] = useState("line");
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [previewShape, setPreviewShape] = useState<Shape | null>(null);
+  const activeTool = useActiveStore((s) => s.activeTool);
+  const setActiveTool = useActiveStore((s) => s.setActive);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,6 +58,10 @@ export default function Canvas() {
     };
   }
 
+  function selectedTool(tool: ToolType) {
+    setActiveTool(tool);
+  }
+
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     setDrawing(true);
     const { clientX, clientY } = event;
@@ -53,7 +71,7 @@ export default function Canvas() {
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!drawing) return;
     const end = getRelativeCoords(event);
-    makeShape(type, start, end, setPreviewShape);
+    makeShape(activeTool, start, end, setPreviewShape);
   };
 
   const handleMouseUp = () => {
@@ -74,35 +92,127 @@ export default function Canvas() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       ></canvas>
-      <div className="absolute top-10 left-60 flex justify-center items-start gap-10">
-        <label htmlFor="Line" className="">
-          Line
-        </label>
-        <input
-          type="radio"
-          name="shape"
-          onClick={() => setType("line")}
-          value={type}
-        />
-        <label htmlFor="Rectangle" className="">
-          Rectangle
-        </label>
-        <input
-          type="radio"
-          name="shape"
-          onClick={() => setType("rectangle")}
-          value={type}
-        />
-        <label htmlFor="Circle" className="">
-          Circle
-        </label>
-        <input
-          type="radio"
-          name="shape"
-          onClick={() => setType("circle")}
-          value={type}
-        />
+      <div className="absolute top-6 left-10">
+        <div className="text-2xl sm:text-3xl">
+          ძထძℓꫀ
+          <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραсꫀ</span>
+        </div>
+      </div>
+      <div className="fixed top-6 right-10 z-20">
+        <div className="bg-neutral-800/50 backdrop-blur-md px-3.5 py-4 rounded-2xl">
+          <div className="flex flex-col gap-3">
+          
+            <div className="flex flex-col gap-2">
+              <Tool
+                onClick={() => selectedTool("rectangle")}
+                name="rectangle"
+                toolTip="Rectangle"
+              >
+                <Rectangle />
+              </Tool>
+              <Tool
+                onClick={() => selectedTool("circle")}
+                name="circle"
+                toolTip="Circle"
+              >
+                <Circle />
+              </Tool>
+              <Tool
+                onClick={() => selectedTool("diamond")}
+                name="diamond"
+                toolTip="Diamond"
+              >
+                <Diamond />
+              </Tool>
+              <Tool
+                onClick={() => selectedTool("arrow")}
+                name="arrow"
+                toolTip="Arrow"
+              >
+                <Arrow />
+              </Tool>
+            </div>
+
+            <div className="w-full h-px bg-neutral-700/50 my-1"></div>
+
+            <div className="flex flex-col gap-2">
+              <Tool
+                onClick={() => selectedTool("line")}
+                name="line"
+                toolTip="Line"
+              >
+                <Line />
+              </Tool>
+              <Tool
+                onClick={() => selectedTool("pencil")}
+                name="pencil"
+                toolTip="Pencil"
+              >
+                <Pencil />
+              </Tool>
+              <Tool
+                onClick={() => selectedTool("text")}
+                name="text"
+                toolTip="Text"
+              >
+                <Text />
+              </Tool>
+            </div>
+
+          
+            <div className="w-full h-px bg-neutral-700/50 my-1"></div>
+
+            <div className="flex flex-col gap-2">
+              <Tool
+                onClick={() => selectedTool("eraser")}
+                name="eraser"
+                toolTip="Eraser"
+              >
+                <Eraser />
+              </Tool>
+
+              <Tool
+                onClick={() => selectedTool("hand")}
+                name="hand"
+                toolTip="Hand - Panning tool"
+              >
+                <Hand />
+              </Tool>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
+
+export function Tool({
+  children,
+  onClick,
+  name,
+  toolTip,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  name: ToolType;
+  toolTip: string;
+}) {
+  const activeTool = useActiveStore((s) => s.activeTool);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+      className={`flex justify-center items-center hover:bg-white/5 hover:scale-110 hover:cursor-pointer w-9 h-9 rounded-lg transition-all ease-in-out duration-300 ${activeTool === name ? `text-cyan-300 scale-110 bg-neutral-600/30` : ``}`}
+    >
+      {children}
+      {hovered && (
+        <div className="absolute right-8 -translate-x-5 px-2 py-0.5 rounded bg-white text-neutral-900 whitespace-nowrap z-10 shadow-lg text-sm">
+          {toolTip}
+        </div>
+      )}
+    </button>
   );
 }

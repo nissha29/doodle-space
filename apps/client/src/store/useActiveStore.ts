@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 export const useActiveStore = create<ShapeTypeStore>()(
     (set) => ({
-        activeTool: 'rectangle',
+        activeTool: 'select',
         setActive: (activeTool) => set({ activeTool })
     }),
 );

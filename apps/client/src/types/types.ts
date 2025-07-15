@@ -48,7 +48,7 @@ export interface ToolProps {
   onClick?: () => void;
 }
 
-export type ToolType = 'rectangle' | 'circle' | 'diamond' | 'arrow' | 'line' | 'pencil' | 'text' | 'eraser' | 'hand'
+export type ToolType = 'rectangle' | 'circle' | 'diamond' | 'arrow' | 'line' | 'pencil' | 'text' | 'eraser' | 'hand' | 'select'
 
 export type ShapeTypeStore = {
   activeTool: ToolType;

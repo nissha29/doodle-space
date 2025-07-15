@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
 export const CreateUserSchema = z.object({
-    name: z.string().min(3, { message: 'Name must be atleast 3 characters' }).max(20, { message: 'Name must be between 3 and 20 characters'}),
+    name: z.string().min(3, { message: 'Name must be atleast 3 characters' }).max(20, { message: 'Name must be between 3 and 20 characters' }),
     email: z.string().email({ message: 'Provide correct email format' }),
-    password: z.string().min(5, { message: 'Password must be atleast 5 characters' }).max(20, { message: 'Password must be between 5 and 20 characters' }).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/,{ message: "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special character" })
+    password: z.string().min(5, { message: 'Password must be atleast 5 characters' }).max(20, { message: 'Password must be between 5 and 20 characters' }).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/, { message: "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special character" })
 })
 
 export const signInSchema = z.object({
     email: z.string().email({ message: 'Provide correct email format' }),
-    password: z.string().min(5, { message: 'Password must be atleast 5 characters' }).max(20, { message: 'Password must be between 5 and 20 characters' }).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/,{ message: "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special character" })
+    password: z.string().min(5, { message: 'Password must be atleast 5 characters' }).max(20, { message: 'Password must be between 5 and 20 characters' }).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/, { message: "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special character" })
 })
 
 export const CreateRoomSchema = z.object({
@@ -17,22 +17,38 @@ export const CreateRoomSchema = z.object({
 
 export type Shape = {
     type: 'rectangle',
-    x1: number,
-    x2: number,
+    x: number,
+    y: number,
     width: number,
-    height: number
+    height: number,
+    seed?: number
 } | {
     type: 'circle',
     x: number,
     y: number,
-    diameter: number
+    diameter: number,
+    seed?: number
 } | {
     type: 'diamond',
-    diamondPoints: [number, number][]
+    diamondPoints: [number, number][],
+    seed?: number
+} | {
+    type: 'arrow',
+    shaft: {
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number
+    },
+    tip: number[],
+    left: number[],
+    right: number[],
+    seed?: number
 } | {
     type: 'line',
     x1: number,
     y1: number,
     x2: number,
-    y2: number
+    y2: number,
+    seed?: number
 }

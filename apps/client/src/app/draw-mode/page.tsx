@@ -14,7 +14,7 @@ export default function () {
 
   return (
     <ProtectedRoute>
-      <div className="px-5 lg:px-20 py-6 w-full h-full">
+      <div className="px-5 lg:px-10 py-6 w-full h-full">
         <div className="flex justify-between items-center">
           <div className="text-2xl sm:text-3xl">
             ძထძℓꫀ

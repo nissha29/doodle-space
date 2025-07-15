@@ -180,7 +180,7 @@ export function Hand() {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke='currentColor'
+      stroke="currentColor"
       strokeWidth={`${activeTool === "hand" ? "2" : "1"}`}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -190,6 +190,27 @@ export function Hand() {
       <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
       <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
       <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+    </svg>
+  );
+}
+
+export function Select() {
+  const activeTool = useActiveStore((s) => s.activeTool);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={`${activeTool === "select" ? "2" : "1"}`}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-mouse-pointer-icon lucide-mouse-pointer"
+    >
+      <path d="M12.586 12.586 19 19" />
+      <path d="M3.688 3.037a.497.497 0 0 0-.651.651l6.5 15.999a.501.501 0 0 0 .947-.062l1.569-6.083a2 2 0 0 1 1.448-1.479l6.124-1.579a.5.5 0 0 0 .063-.947z" />
     </svg>
   );
 }

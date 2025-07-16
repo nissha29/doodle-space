@@ -7,7 +7,7 @@ import { cursorStyle } from "@/utils/cursorStyle";
 import { getDrawable } from "@/utils/getDrawable";
 import { makeShape } from "@/utils/makeShape";
 import isPointInShape from "@/utils/ShapeHitTest";
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 import { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
 
@@ -19,10 +19,12 @@ export default function Canvas() {
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [previewShape, setPreviewShape] = useState<Shape | null>(null);
-  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(null);
-  const [lastMousePos, setLastMousePos] = useState<{
-    x: number;
-    y: number;
+  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
+    null
+  );
+  const [dragOffset, setDragOffset] = useState<{
+    dx: number;
+    dy: number;
   } | null>(null);
   const activeTool = useActiveStore((s) => s.activeTool);
 
@@ -72,45 +74,79 @@ export default function Canvas() {
     };
   }
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (activeTool === "select") {
+  function handleMouseDownOnSelect(point: any) {
+    const index = shapes.findIndex((shape) => isPointInShape(point, shape));
+
+    if (index !== -1) {
+      const shape = shapes[index];
+      const shapeStart = shape.dimension[0];
+      setSelectedShapeIndex(index);
+      setDragOffset({
+        dx: point.x - shapeStart.x,
+        dy: point.y - shapeStart.y,
+      });
+      start;
       setAction("move");
-      const point = getRelativeCoords(event);
-      const index = shapes.findIndex((shape) => isPointInShape(point, shape));
-      if (index !== -1) {
-        setSelectedShapeIndex(index);
-        setLastMousePos(point);
-      }
+    }
+  }
+
+  function handleMouseMovementOnMove(mouse: Dimension) {
+    setShapes((prev: Shape[]) =>
+      prev.map((shape, index) => {
+        if (index === selectedShapeIndex) {
+          const dim0 = shape.dimension[0];
+          const dim1 = shape.dimension[1];
+
+          const rel = {
+            x: dim1.x - dim0.x,
+            y: dim1.y - dim0.y,
+          };
+          const start: Dimension = {
+            x: mouse.x - dragOffset!.dx,
+            y: mouse.y - dragOffset!.dy,
+          };
+          const end: Dimension = {
+            x: start.x + rel.x,
+            y: start.y + rel.y,
+          };
+          return makeShape(shape.type, start, end)!;
+        }
+        return shape;
+      })
+    );
+  }
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const cords = getRelativeCoords(event);
+
+    if (activeTool === "select") {
+      handleMouseDownOnSelect(cords);
     } else {
       setAction("draw");
-      const { clientX, clientY } = event;
-      setStart({ x: clientX, y: clientY });
+      setStart(cords);
     }
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const end = getRelativeCoords(event);
-    if (action === "draw") {
-      makeShape(activeTool, start, end, setPreviewShape);
-    }
-    else if(action === "move" && selectedShapeIndex !== null && lastMousePos){
-      const dx = end.x - lastMousePos.x;
-      const dy = end.y - lastMousePos.y;
-      setShapes((prev: any) => prev.map((shape: Shape, index: number) => {
-        index === selectedShapeIndex ? {
-          
-        } : {
+    const cords = getRelativeCoords(event);
 
-        }
-      }))
+    if (action === "draw") {
+      const shape = makeShape(activeTool, start, cords);
+      if (!shape) return;
+      setPreviewShape(shape);
+    } else if (action === "move" && selectedShapeIndex !== null && dragOffset) {
+      handleMouseMovementOnMove(cords);
     }
   };
 
   const handleMouseUp = () => {
-    if (action === "none" || !previewShape) return;
-    setAction("none");
-    setShapes((prev) => [...prev, previewShape]);
+    if (action === "draw") {
+      if (previewShape) setShapes((prev) => [...prev, previewShape]);
+    } else if (action === "move") {
+      setSelectedShapeIndex(null);
+    }
     setPreviewShape(null);
+    setAction("none");
   };
 
   return (

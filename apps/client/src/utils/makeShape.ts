@@ -1,12 +1,12 @@
 import { ToolType } from "@/types/types";
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 
-export const makeShape = (active: ToolType, start: any, end: { x: number, y: number }, setPreviewShape: any) => {
+export const makeShape = (active: ToolType, start: Dimension, end: Dimension) => {
   let shape: Shape;
 
   switch (active) {
     case "rectangle": {
-      shape = { type: "rectangle", x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
+      shape = { type: "rectangle", dimension: [start, end], x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
       break;
     }
 
@@ -14,7 +14,7 @@ export const makeShape = (active: ToolType, start: any, end: { x: number, y: num
       const diameter = Math.sqrt(
         Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
       );
-      shape = { type: "circle", x: start.x, y: start.y, diameter, seed: 2 };
+      shape = { type: "circle", dimension: [start, end], x: start.x, y: start.y, diameter, seed: 2 };
       break;
     }
 
@@ -28,7 +28,7 @@ export const makeShape = (active: ToolType, start: any, end: { x: number, y: num
         [cx, cy + size],
         [cx - size, cy],
       ];
-      shape = { type: 'diamond', diamondPoints: diamondPoints, seed: 3 }
+      shape = { type: 'diamond', dimension: [start, end], diamondPoints: diamondPoints, seed: 3 }
       break;
     }
 
@@ -46,12 +46,12 @@ export const makeShape = (active: ToolType, start: any, end: { x: number, y: num
         end.x - headLength * Math.cos(angle + Math.PI / 6),
         end.y - headLength * Math.sin(angle + Math.PI / 6)
       ];
-      shape = { type: 'arrow', shaft, tip, left, right, seed: 4 }
+      shape = { type: 'arrow', dimension: [start, end], shaft, tip, left, right, seed: 4 }
       break;
     }
 
     case "line": {
-      shape = { type: "line", x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
+      shape = { type: "line", dimension: [start, end], x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
       break;
     }
 
@@ -59,5 +59,5 @@ export const makeShape = (active: ToolType, start: any, end: { x: number, y: num
       console.log("invalid shape type");
       return;
   }
-  setPreviewShape(shape);
+  return shape;
 }

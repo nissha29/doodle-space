@@ -9,5 +9,5 @@ export const cursorStyle = {
     'text': 'crosshair',
     'eraser': "url('/eraser.svg'),pointer",
     'hand': 'grab',
-    'select': 'default',
+    'select': 'move',
 }

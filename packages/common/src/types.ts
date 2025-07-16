@@ -15,8 +15,14 @@ export const CreateRoomSchema = z.object({
     linkId: z.string(),
 })
 
+export type Dimension = {
+    x: number,
+    y: number
+}
+
 export type Shape = {
     type: 'rectangle',
+    dimension: Dimension[],
     x: number,
     y: number,
     width: number,
@@ -24,16 +30,19 @@ export type Shape = {
     seed?: number
 } | {
     type: 'circle',
+    dimension: Dimension[],
     x: number,
     y: number,
     diameter: number,
     seed?: number
 } | {
     type: 'diamond',
+    dimension: Dimension[],
     diamondPoints: [number, number][],
     seed?: number
 } | {
     type: 'arrow',
+    dimension: Dimension[],
     shaft: {
         x1: number,
         y1: number,
@@ -46,6 +55,7 @@ export type Shape = {
     seed?: number
 } | {
     type: 'line',
+    dimension: Dimension[],
     x1: number,
     y1: number,
     x2: number,

@@ -54,3 +54,5 @@ export type ShapeTypeStore = {
   activeTool: ToolType;
   setActive: (shapeType: ToolType) => void;
 }
+
+export type Action = 'none' | 'move' | 'draw' | 'resize'

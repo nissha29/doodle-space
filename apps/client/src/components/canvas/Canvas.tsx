@@ -3,12 +3,14 @@
 import { SelectTool } from "@/components/canvas/selectTool";
 import { useActiveStore } from "@/store/useActiveStore";
 import { Action } from "@/types/types";
+import { getBoundingBox } from "@/utils/boundingBox";
 import { cursorStyle } from "@/utils/cursorStyle";
+import { drawBoundingBoxAndHandlers } from "@/utils/drawBoundingBox";
 import { getDrawable } from "@/utils/getDrawable";
 import { makeShape } from "@/utils/makeShape";
-import isPointInShape from "@/utils/ShapeHitTest";
+import { isPointInsideOrOnBoundingBox } from "@/utils/ShapeHitTest";
 import { Dimension, Shape } from "@repo/common/types";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
 
 const generator = rough.generator();
@@ -58,7 +60,15 @@ export default function Canvas() {
         }
       }
     }
-  }, [shapes, previewShape]);
+
+    if(activeTool === 'select' && selectedShapeIndex !== null){
+      console.log('making bounding box');
+      const shape = shapes[selectedShapeIndex];
+      const box = getBoundingBox(shape);
+      if(! box) return;
+      drawBoundingBoxAndHandlers(generator, roughCanvas, box);
+    }
+  }, [shapes, previewShape, activeTool, selectedShapeIndex]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -74,20 +84,27 @@ export default function Canvas() {
     };
   }
 
-  function handleMouseDownOnSelect(point: any) {
-    const index = shapes.findIndex((shape) => isPointInShape(point, shape));
+  function checkIsCursorInShape(cords: Dimension) {
+    const index = shapes.findIndex((shape) => isPointInsideOrOnBoundingBox(cords, shape));
 
     if (index !== -1) {
       const shape = shapes[index];
       const shapeStart = shape.dimension[0];
       setSelectedShapeIndex(index);
       setDragOffset({
-        dx: point.x - shapeStart.x,
-        dy: point.y - shapeStart.y,
+        dx: cords.x - shapeStart.x,
+        dy: cords.y - shapeStart.y,
       });
-      start;
-      setAction("move");
+      return true;
     }
+    else{
+      setSelectedShapeIndex(null);
+      return false;
+    }
+  }
+
+  function checkIsCursorOnHandlers(cords: Dimension){
+    return true;
   }
 
   function handleMouseMovementOnMove(mouse: Dimension) {
@@ -116,14 +133,25 @@ export default function Canvas() {
     );
   }
 
+  function onTopLeftOrBottomRightHandler(){
+    return true;
+  }
+
+  function onTopRightOrBottomLeftHandler(){
+    return true;
+  }
+
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const cords = getRelativeCoords(event);
 
     if (activeTool === "select") {
-      handleMouseDownOnSelect(cords);
+      if(checkIsCursorInShape(cords)){
+        setAction('move');
+      }
     } else {
       setAction("draw");
       setStart(cords);
+      setSelectedShapeIndex(null);
     }
   };
 
@@ -149,6 +177,16 @@ export default function Canvas() {
     setAction("none");
   };
 
+  const handleMouseClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const cords = getRelativeCoords(event);
+
+    if(activeTool === 'select'){
+      checkIsCursorInShape(cords);
+    }else {
+      setSelectedShapeIndex(null);
+    }
+  }
+
   return (
     <div className="relative">
       <canvas
@@ -159,6 +197,7 @@ export default function Canvas() {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onClick={handleMouseClick}
       ></canvas>
       <div className="absolute top-6 left-10">
         <div className="text-2xl sm:text-3xl">

@@ -1,5 +1,25 @@
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 import { getBoundingBox } from "./boundingBox";
+import { Dispatch, SetStateAction } from "react";
+
+export function checkIsCursorInShape(cords: Dimension, shapes: Shape[], setSelectedShapeIndex: Dispatch<SetStateAction<number | null>>, setDragOffset: Dispatch<SetStateAction<{ dx: number, dy: number } | null>>) {
+  const index = shapes.findIndex((shape) => isPointInsideOrOnBoundingBox(cords, shape));
+
+  if (index !== -1) {
+    const shape = shapes[index];
+    const shapeStart = shape.dimension[0];
+    setSelectedShapeIndex(index);
+    setDragOffset({
+      dx: cords.x - shapeStart.x,
+      dy: cords.y - shapeStart.y,
+    });
+    return true;
+  }
+  else {
+    setSelectedShapeIndex(null);
+    return false;
+  }
+}
 
 export function isPointInsideOrOnBoundingBox(
   cords: { x: number, y: number },

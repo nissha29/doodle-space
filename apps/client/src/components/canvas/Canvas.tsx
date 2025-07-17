@@ -8,7 +8,8 @@ import { cursorStyle } from "@/utils/cursorStyle";
 import { drawBoundingBoxAndHandlers } from "@/utils/drawBoundingBox";
 import { getDrawable } from "@/utils/getDrawable";
 import { makeShape } from "@/utils/makeShape";
-import { isPointInsideOrOnBoundingBox } from "@/utils/ShapeHitTest";
+import { handleMouseMovementOnMove } from "@/utils/MouseMove";
+import { checkIsCursorInShape, isPointInsideOrOnBoundingBox } from "@/utils/ShapeHitTest";
 import { Dimension, Shape } from "@repo/common/types";
 import React, { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
@@ -62,7 +63,6 @@ export default function Canvas() {
     }
 
     if(activeTool === 'select' && selectedShapeIndex !== null){
-      console.log('making bounding box');
       const shape = shapes[selectedShapeIndex];
       const box = getBoundingBox(shape);
       if(! box) return;
@@ -84,60 +84,7 @@ export default function Canvas() {
     };
   }
 
-  function checkIsCursorInShape(cords: Dimension) {
-    const index = shapes.findIndex((shape) => isPointInsideOrOnBoundingBox(cords, shape));
-
-    if (index !== -1) {
-      const shape = shapes[index];
-      const shapeStart = shape.dimension[0];
-      setSelectedShapeIndex(index);
-      setDragOffset({
-        dx: cords.x - shapeStart.x,
-        dy: cords.y - shapeStart.y,
-      });
-      return true;
-    }
-    else{
-      setSelectedShapeIndex(null);
-      return false;
-    }
-  }
-
   function checkIsCursorOnHandlers(cords: Dimension){
-    return true;
-  }
-
-  function handleMouseMovementOnMove(mouse: Dimension) {
-    setShapes((prev: Shape[]) =>
-      prev.map((shape, index) => {
-        if (index === selectedShapeIndex) {
-          const dim0 = shape.dimension[0];
-          const dim1 = shape.dimension[1];
-
-          const rel = {
-            x: dim1.x - dim0.x,
-            y: dim1.y - dim0.y,
-          };
-          const start: Dimension = {
-            x: mouse.x - dragOffset!.dx,
-            y: mouse.y - dragOffset!.dy,
-          };
-          const end: Dimension = {
-            x: start.x + rel.x,
-            y: start.y + rel.y,
-          };
-          return makeShape(shape.type, start, end)!;
-        }
-        return shape;
-      })
-    );
-  }
-
-  function onTopLeftOrBottomRightHandler(){
-    return true;
-  }
-
-  function onTopRightOrBottomLeftHandler(){
     return true;
   }
 
@@ -145,8 +92,10 @@ export default function Canvas() {
     const cords = getRelativeCoords(event);
 
     if (activeTool === "select") {
-      if(checkIsCursorInShape(cords)){
+      if(checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset)){
         setAction('move');
+      }else if(checkIsCursorOnHandlers(cords)){
+
       }
     } else {
       setAction("draw");
@@ -163,7 +112,7 @@ export default function Canvas() {
       if (!shape) return;
       setPreviewShape(shape);
     } else if (action === "move" && selectedShapeIndex !== null && dragOffset) {
-      handleMouseMovementOnMove(cords);
+      handleMouseMovementOnMove(cords, setShapes, selectedShapeIndex, dragOffset);
     }
   };
 
@@ -181,7 +130,7 @@ export default function Canvas() {
     const cords = getRelativeCoords(event);
 
     if(activeTool === 'select'){
-      checkIsCursorInShape(cords);
+      checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset);
     }else {
       setSelectedShapeIndex(null);
     }

@@ -6,7 +6,7 @@ export const getDrawable = (shape: Shape, generator: RoughGenerator) => {
     console.log('shape type not defined');
     return;
   }
-  console.log(shape.type);
+  
   switch (shape.type) {
     case "rectangle": {
       const { x, y, width, height, seed } = shape;

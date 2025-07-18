@@ -41,9 +41,9 @@ export default function isPointInShape(point: { x: number, y: number }, shape: S
     case "diamond":
       return isPointInDiamond(point, shape);
     case "arrow":
-      return isPointNearArrow(point, shape, 5); 
+      return isPointNearArrow(point, shape, 10); 
     case "line":
-      return isPointNearLine(point, shape, 5);
+      return isPointNearLine(point, shape, 10);
     default:
       return false;
   }

@@ -97,31 +97,37 @@ export default function Canvas() {
   }
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-  const cords = getRelativeCoords(event);
+    const cords = getRelativeCoords(event);
 
-  if (activeTool === "select") {
-    const handlerIndex = checkIsCursorOnHandlers(cords, selectedShapeIndex, shapes);
-    
-    if (typeof handlerIndex === "number" && selectedShapeIndex !== null) {
-      setAction("resize");
-      setResizeHandlerIndex(handlerIndex);
-    } else {
-      const index = checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset);
-      if (index !== -1) {
-        setAction("move");
+    if (activeTool === "select") {
+      const handlerIndex = checkIsCursorOnHandlers(
+        cords,
+        selectedShapeIndex,
+        shapes
+      );
+
+      if (typeof handlerIndex === "number" && selectedShapeIndex !== null) {
+        setAction("resize");
+        setResizeHandlerIndex(handlerIndex);
+      } else {
+        const index = checkIsCursorInShape(
+          cords,
+          shapes,
+          setSelectedShapeIndex,
+          setDragOffset
+        );
+        if (index !== -1) {
+          setAction("move");
+        }
       }
+    } else if (activeTool === "eraser") {
+      setAction("erase");
+    } else {
+      setAction("draw");
+      setStart(cords);
+      setSelectedShapeIndex(null);
     }
-  } else if (activeTool === "eraser") {
-    const hitIndex = getShapeIndexOnPrecisePoint(cords, shapes);
-    if (hitIndex !== -1) {
-      setShapes((prev) => prev.filter((_shape, index) => index !== hitIndex));
-    }
-  } else {
-    setAction("draw");
-    setStart(cords);
-    setSelectedShapeIndex(null);
-  }
-};
+  };
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const cords = getRelativeCoords(event);
 
@@ -131,9 +137,25 @@ export default function Canvas() {
       setPreviewShape(shape);
     } else if (action === "move" && selectedShapeIndex !== null && dragOffset) {
       console.log(action);
-      handleMouseMovementOnMove(cords,setShapes,selectedShapeIndex,dragOffset);
+      handleMouseMovementOnMove(
+        cords,
+        setShapes,
+        selectedShapeIndex,
+        dragOffset
+      );
     } else if (action === "resize" && selectedShapeIndex != null) {
-      handleMouseMovementOnResize(cords,shapes,setShapes,selectedShapeIndex,resizeHandlerIndex);
+      handleMouseMovementOnResize(
+        cords,
+        shapes,
+        setShapes,
+        selectedShapeIndex,
+        resizeHandlerIndex
+      );
+    } else if (action === "erase") {
+      const hitIndex = getShapeIndexOnPrecisePoint(cords, shapes);
+      if (hitIndex !== -1) {
+        setShapes((prev) => prev.filter((_shape, index) => index !== hitIndex));
+      }
     }
   };
 
@@ -151,16 +173,9 @@ export default function Canvas() {
     const cords = getRelativeCoords(event);
 
     if (activeTool === "select") {
-      checkIsCursorInShape(
-        cords,
-        shapes,
-        setSelectedShapeIndex,
-        setDragOffset
-      );
-    } else {
-    if (activeTool !== "eraser") {
+      checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset);
+    } else if (activeTool !== "eraser") {
       setSelectedShapeIndex(null);
-    }
     }
   };
 
@@ -171,9 +186,9 @@ export default function Canvas() {
         width={1920}
         height={910}
         className="text-white"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        onPointerDown={handleMouseDown}
+        onPointerMove={handleMouseMove}
+        onPointerUp={handleMouseUp}
         onClick={handleMouseClick}
       ></canvas>
       <div className="absolute top-6 left-10">

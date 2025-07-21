@@ -61,4 +61,11 @@ export type Shape = {
     x2: number,
     y2: number,
     seed?: number
+} | {
+    type: 'text',
+    x: number;
+    y: number;
+    text: string;
+    font: string;
+    color: string;
 }

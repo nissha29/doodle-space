@@ -6,7 +6,7 @@ export const cursorStyle = {
     'arrow': 'crosshair',
     'line': 'crosshair',
     'pencil': 'crosshair',
-    'text': 'crosshair',
+    'text': '',
     'eraser': "url('/eraser.svg'),pointer",
     'hand': 'grab',
     'select': 'move',

@@ -1,5 +1,6 @@
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 import { getBoundingBox } from "./boundingBox";
+import { TextInput } from "@/types/types";
 
 export function isPointInsideOrOnBoundingBox(
   cords: { x: number, y: number },
@@ -32,7 +33,7 @@ export function isPointInsideOrOnBoundingBox(
 }
 
 
-export default function isPointInShape(point: { x: number, y: number }, shape: Shape) {
+export default function isPointInShape(shape: Shape, point: Dimension, ctx?: CanvasRenderingContext2D) {
   switch (shape.type) {
     case "rectangle":
       return isPointInRect(point, shape);
@@ -41,9 +42,11 @@ export default function isPointInShape(point: { x: number, y: number }, shape: S
     case "diamond":
       return isPointInDiamond(point, shape);
     case "arrow":
-      return isPointNearArrow(point, shape, 10); 
+      return isPointNearArrow(point, shape, 10);
     case "line":
       return isPointNearLine(point, shape, 10);
+    case "text":
+      if(ctx) return isPointInText(point, shape, ctx);
     default:
       return false;
   }
@@ -72,7 +75,7 @@ function distanceSq(x1: number, y1: number, x2: number, y2: number) {
 }
 
 function isPointInCircle(point: { x: number, y: number }, shape: Shape) {
-  
+
   if (shape.type !== "circle") return false;
   const [start, end] = shape.dimension;
   const cx = start.x, cy = start.y;
@@ -81,7 +84,7 @@ function isPointInCircle(point: { x: number, y: number }, shape: Shape) {
 }
 
 function isPointInDiamond(point: { x: number, y: number }, shape: Shape) {
-  
+
   if (shape.type !== "diamond") return false;
   const pts = shape.diamondPoints;
 
@@ -111,7 +114,7 @@ function pointLineDist(px: number, py: number, x1: number, y1: number, x2: numbe
 }
 
 function isPointNearArrow(point: { x: number, y: number }, shape: Shape, tolerance: number) {
-  if(shape.type !== "arrow") return false;
+  if (shape.type !== "arrow") return false;
   const shaft = shape.shaft;
   const nearShaft = pointLineDist(point.x, point.y, shaft.x1, shaft.y1, shaft.x2, shaft.y2) <= tolerance;
   const nearLeft = pointLineDist(point.x, point.y, shape.tip[0], shape.tip[1], shape.left[0], shape.left[1]) <= tolerance;
@@ -120,7 +123,27 @@ function isPointNearArrow(point: { x: number, y: number }, shape: Shape, toleran
 }
 
 function isPointNearLine(point: { x: number, y: number }, shape: Shape, tolerance: number) {
-  
+
   if (shape.type !== "line") return false;
   return pointLineDist(point.x, point.y, shape.x1, shape.y1, shape.x2, shape.y2) <= tolerance;
 }
+
+function isPointInText(
+  point: Dimension,
+  shape: Shape,
+  ctx: CanvasRenderingContext2D
+): boolean {
+  if (shape.type !== 'text') return false;
+
+  ctx.font = shape.font || "24px Arial";
+  const width = ctx.measureText(shape.text).width;
+  const height = parseInt(shape.font || "24", 10); 
+
+  return (
+    point.x >= shape.x &&
+    point.x <= shape.x + width &&
+    point.y >= shape.y &&
+    point.y <= shape.y + height
+  );
+}
+

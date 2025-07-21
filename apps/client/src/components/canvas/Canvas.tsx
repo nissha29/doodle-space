@@ -2,13 +2,13 @@
 
 import { SelectTool } from "@/components/canvas/selectTool";
 import { useActiveStore } from "@/store/useActiveStore";
-import { Action } from "@/types/types";
+import { Action, TextInput } from "@/types/types";
 import {
   getBoundingBox,
   drawBoundingBoxAndHandlers,
 } from "@/utils/boundingBox";
 import { cursorStyle } from "@/utils/cursorStyle";
-import { getDrawable } from "@/utils/getDrawable";
+import { getDrawable, getText } from "@/utils/getDrawable";
 import {
   handleMouseMovementOnMove,
   handleMouseMovementOnResize,
@@ -22,6 +22,7 @@ import {
 import { Shape } from "@repo/common/types";
 import React, { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
+import { InputText } from "./InputText";
 
 const generator = rough.generator();
 
@@ -42,6 +43,7 @@ export default function Canvas() {
     dy: number;
   } | null>(null);
   const activeTool = useActiveStore((s) => s.activeTool);
+  const [textInput, setTextInput] = useState<TextInput | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -53,23 +55,31 @@ export default function Canvas() {
     const roughCanvas = rough.canvas(canvas);
 
     shapes.forEach((shape) => {
-      const draw = getDrawable(shape, generator);
-      if (draw) {
-        if (Array.isArray(draw)) {
-          draw.forEach((d) => roughCanvas.draw(d));
-        } else {
-          roughCanvas.draw(draw);
+      if (shape.type === "text") {
+        getText(ctx, shape);
+      } else {
+        const draw = getDrawable(shape, generator);
+        if (draw) {
+          if (Array.isArray(draw)) {
+            draw.forEach((d) => roughCanvas.draw(d));
+          } else {
+            roughCanvas.draw(draw);
+          }
         }
       }
     });
 
     if (previewShape) {
-      const draw = getDrawable(previewShape, generator);
-      if (draw) {
-        if (Array.isArray(draw)) {
-          draw.forEach((d) => roughCanvas.draw(d));
-        } else {
-          roughCanvas.draw(draw);
+      if (previewShape.type === "text") {
+        getText(ctx, previewShape);
+      } else {
+        const draw = getDrawable(previewShape, generator);
+        if (draw) {
+          if (Array.isArray(draw)) {
+            draw.forEach((d) => roughCanvas.draw(d));
+          } else {
+            roughCanvas.draw(draw);
+          }
         }
       }
     }
@@ -98,6 +108,10 @@ export default function Canvas() {
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const cords = getRelativeCoords(event);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     if (activeTool === "select") {
       const handlerIndex = checkIsCursorOnHandlers(
@@ -114,7 +128,8 @@ export default function Canvas() {
           cords,
           shapes,
           setSelectedShapeIndex,
-          setDragOffset
+          setDragOffset,
+          ctx
         );
         if (index !== -1) {
           setAction("move");
@@ -171,9 +186,15 @@ export default function Canvas() {
 
   const handleMouseClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const cords = getRelativeCoords(event);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     if (activeTool === "select") {
-      checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset);
+      checkIsCursorInShape(cords, shapes, setSelectedShapeIndex, setDragOffset, ctx);
+    } else if (activeTool === "text") {
+      setTextInput({ cords, value: "" });
     } else if (activeTool !== "eraser") {
       setSelectedShapeIndex(null);
     }
@@ -191,6 +212,14 @@ export default function Canvas() {
         onPointerUp={handleMouseUp}
         onClick={handleMouseClick}
       ></canvas>
+
+      <InputText
+        textInput={textInput}
+        setShapes={setShapes}
+        setTextInput={setTextInput}
+        shapes={shapes}
+      />
+
       <div className="absolute top-6 left-10">
         <div className="text-2xl sm:text-3xl">
           ძထძℓꫀ

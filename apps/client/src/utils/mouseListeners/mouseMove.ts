@@ -64,30 +64,34 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
 }
 
 export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<SetStateAction<Shape[]>>, selectedShapeIndex: number, dragOffset: { dx: number, dy: number }) {
-    setShapes((prev: Shape[]) =>
-      prev.map((shape, index) => {
-        if (index === selectedShapeIndex) {
-          const dim0 = shape.dimension[0];
-          const dim1 = shape.dimension[1];
+  setShapes((prev: Shape[]) =>
+    prev.map((shape, index) => {
+      if (index === selectedShapeIndex) {
 
-          const rel = {
-            x: dim1.x - dim0.x,
-            y: dim1.y - dim0.y,
-          };
-          const start: Dimension = {
-            x: mouse.x - dragOffset!.dx,
-            y: mouse.y - dragOffset!.dy,
-          };
-          const end: Dimension = {
-            x: start.x + rel.x,
-            y: start.y + rel.y,
-          };
-          return makeShape(shape.type, start, end)!;
+        if (shape.type === 'text') {
+          return shape;
         }
-        return shape;
-      })
-    );
-  }
+        const dim0 = shape.dimension[0];
+        const dim1 = shape.dimension[1];
+
+        const rel = {
+          x: dim1.x - dim0.x,
+          y: dim1.y - dim0.y,
+        };
+        const start: Dimension = {
+          x: mouse.x - dragOffset!.dx,
+          y: mouse.y - dragOffset!.dy,
+        };
+        const end: Dimension = {
+          x: start.x + rel.x,
+          y: start.y + rel.y,
+        };
+        return makeShape(shape.type, start, end)!;
+      }
+      return shape;
+    })
+  );
+}
 
 export function handleMouseMovementOnResize(
   mouse: Dimension,
@@ -97,29 +101,34 @@ export function handleMouseMovementOnResize(
   resizeHandleIndex: number | null,
 ) {
   const initialShape = shapes[selectedShapeIndex];
+  if (!initialShape) {
+    return; 
+  }
 
-  setShapes((prev: Shape[]) => 
+  setShapes((prev: Shape[]) =>
     prev.map((shape, index) => {
       if (index !== selectedShapeIndex) return shape;
-
+      if(initialShape.type === 'text'){
+        return shape;
+      }
       const [start, end] = initialShape.dimension;
       let newStart = { ...start };
       let newEnd = { ...end };
 
-      switch(resizeHandleIndex) {
-        case 0: 
+      switch (resizeHandleIndex) {
+        case 0:
           newStart = mouse;
           newEnd = end;
           break;
-        case 1: 
+        case 1:
           newStart = { x: start.x, y: mouse.y };
           newEnd = { x: mouse.x, y: end.y };
           break;
-        case 2: 
+        case 2:
           newStart = start;
           newEnd = mouse;
           break;
-        case 3: 
+        case 3:
           newStart = { x: mouse.x, y: start.y };
           newEnd = { x: end.x, y: mouse.y };
           break;

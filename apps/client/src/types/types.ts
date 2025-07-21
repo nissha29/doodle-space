@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 
 export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -56,3 +56,5 @@ export type ShapeTypeStore = {
 }
 
 export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase'
+
+export type TextInput = { cords: Dimension, value: string};

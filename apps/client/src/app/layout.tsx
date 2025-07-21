@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, EB_Garamond } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const ebGaramond = EB_Garamond({
   variable: "--font-geist-sans",
@@ -30,6 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${ebGaramond.className} antialiased`}>
         <Toaster
           position="top-right"

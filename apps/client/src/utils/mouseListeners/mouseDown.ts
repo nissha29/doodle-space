@@ -2,7 +2,6 @@ import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
 import isPointInShape, { isPointInsideOrOnBoundingBox } from "../ShapeHitTest";
 import { getBoundingBox, getHandlerPositions } from "../boundingBox";
-import { ToolType } from "@/types/types";
 
 export function getShapeIndexWithinBoundingBox(
   cords: Dimension,
@@ -15,25 +14,42 @@ export function getShapeIndexWithinBoundingBox(
 
 export function getShapeIndexOnPrecisePoint(
   cords: Dimension,
-  shapes: Shape[]
+  shapes: Shape[],
+  ctx?: CanvasRenderingContext2D
 ): number {
-  return shapes.findIndex((shape) => isPointInShape(cords, shape));
+  return shapes.findIndex((shape) => {
+    if (shape.type === 'text') {
+      return isPointInShape(shape, cords, ctx)
+    } else {
+      return isPointInShape(shape, cords)
+    }
+  });
 }
 
 
 
-export function checkIsCursorInShape(cords: Dimension, shapes: Shape[], setSelectedShapeIndex: Dispatch<SetStateAction<number | null>>, setDragOffset: Dispatch<SetStateAction<{ dx: number, dy: number } | null>>) {
-   const index = getShapeIndexWithinBoundingBox(cords, shapes);
+export function checkIsCursorInShape(cords: Dimension, shapes: Shape[], setSelectedShapeIndex: Dispatch<SetStateAction<number | null>>, setDragOffset: Dispatch<SetStateAction<{ dx: number, dy: number } | null>>, ctx: CanvasRenderingContext2D) {
+  const textIndex = getShapeIndexOnPrecisePoint(cords, shapes, ctx);
+  if (textIndex !== -1) {
+    const shape = shapes[textIndex];
+    if (shape.type === 'text') {
+      setSelectedShapeIndex(textIndex);
+      return textIndex;
+    }
+  }
+  const index = getShapeIndexWithinBoundingBox(cords, shapes);
 
   if (index !== -1) {
     const shape = shapes[index];
-    const shapeStart = shape.dimension[0];
-    setSelectedShapeIndex(index);
-    setDragOffset({
-      dx: cords.x - shapeStart.x,
-      dy: cords.y - shapeStart.y,
-    });
-    return index;
+    if (shape.type !== 'text') {
+      const shapeStart = shape.dimension[0];
+      setSelectedShapeIndex(index);
+      setDragOffset({
+        dx: cords.x - shapeStart.x,
+        dy: cords.y - shapeStart.y,
+      });
+      return index;
+    }
   }
   else {
     setSelectedShapeIndex(null);
@@ -60,7 +76,7 @@ export function checkIsCursorOnHandlers(cords: Dimension, selectedShapeIndex: nu
   const handlers = pos.handlers;
   for (let i = 0; i < handlers.length; i++) {
     if (isCursorOnHandler(cords, handlers[i], handleSize)) {
-      return i; 
+      return i;
     }
   }
   return false;

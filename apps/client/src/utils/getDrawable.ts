@@ -2,11 +2,11 @@ import { Shape } from "@repo/common/types";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 export const getDrawable = (shape: Shape, generator: RoughGenerator) => {
-  if(! shape?.type){
+  if (!shape?.type) {
     console.log('shape type not defined');
     return;
   }
-  
+
   switch (shape.type) {
     case "rectangle": {
       const { x, y, width, height, seed } = shape;
@@ -37,3 +37,12 @@ export const getDrawable = (shape: Shape, generator: RoughGenerator) => {
       return;
   }
 };
+
+export const getText = (ctx: CanvasRenderingContext2D, shape: Shape) => {
+  if (shape.type !== 'text') return;
+
+  ctx.font = "24px 'Indie Flower'";
+  ctx.fillStyle = "#0ff";
+  ctx.textBaseline = "top";
+  ctx.fillText(shape.text, shape.x, shape.y);
+}

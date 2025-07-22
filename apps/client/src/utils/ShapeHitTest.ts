@@ -1,13 +1,13 @@
 import { Dimension, Shape } from "@repo/common/types";
 import { getBoundingBox } from "./boundingBox";
-import { TextInput } from "@/types/types";
 
 export function isPointInsideOrOnBoundingBox(
   cords: { x: number, y: number },
   shape: Shape,
+  ctx: CanvasRenderingContext2D,
   handlerRadius = 12
 ) {
-  const box = getBoundingBox(shape);
+  const box = getBoundingBox(shape, ctx);
   if (!box) return false;
 
   const handlers = [
@@ -34,6 +34,9 @@ export function isPointInsideOrOnBoundingBox(
 
 
 export default function isPointInShape(shape: Shape, point: Dimension, ctx?: CanvasRenderingContext2D) {
+  if(ctx && shape.type === 'text'){
+    return isPointInText(point, shape, ctx);
+  }
   switch (shape.type) {
     case "rectangle":
       return isPointInRect(point, shape);
@@ -45,14 +48,12 @@ export default function isPointInShape(shape: Shape, point: Dimension, ctx?: Can
       return isPointNearArrow(point, shape, 10);
     case "line":
       return isPointNearLine(point, shape, 10);
-    case "text":
-      if(ctx) return isPointInText(point, shape, ctx);
     default:
       return false;
   }
 }
 
-function isPointInRect(point: { x: number, y: number }, shape: Shape) {
+function isPointInRect(point: { x: number, y: number }, shape: Shape): boolean {
   if (shape.type !== 'rectangle') return false;
 
   const [start, end] = shape.dimension;
@@ -74,7 +75,7 @@ function distanceSq(x1: number, y1: number, x2: number, y2: number) {
   return (x1 - x2) ** 2 + (y1 - y2) ** 2;
 }
 
-function isPointInCircle(point: { x: number, y: number }, shape: Shape) {
+function isPointInCircle(point: { x: number, y: number }, shape: Shape): boolean {
 
   if (shape.type !== "circle") return false;
   const [start, end] = shape.dimension;
@@ -83,7 +84,7 @@ function isPointInCircle(point: { x: number, y: number }, shape: Shape) {
   return distanceSq(point.x, point.y, cx, cy) <= r * r;
 }
 
-function isPointInDiamond(point: { x: number, y: number }, shape: Shape) {
+function isPointInDiamond(point: { x: number, y: number }, shape: Shape): boolean {
 
   if (shape.type !== "diamond") return false;
   const pts = shape.diamondPoints;
@@ -113,7 +114,7 @@ function pointLineDist(px: number, py: number, x1: number, y1: number, x2: numbe
   return Math.sqrt(distanceSq(px, py, closeX, closeY));
 }
 
-function isPointNearArrow(point: { x: number, y: number }, shape: Shape, tolerance: number) {
+function isPointNearArrow(point: { x: number, y: number }, shape: Shape, tolerance: number): boolean {
   if (shape.type !== "arrow") return false;
   const shaft = shape.shaft;
   const nearShaft = pointLineDist(point.x, point.y, shaft.x1, shaft.y1, shaft.x2, shaft.y2) <= tolerance;
@@ -122,28 +123,27 @@ function isPointNearArrow(point: { x: number, y: number }, shape: Shape, toleran
   return nearShaft || nearLeft || nearRight;
 }
 
-function isPointNearLine(point: { x: number, y: number }, shape: Shape, tolerance: number) {
+function isPointNearLine(point: { x: number, y: number }, shape: Shape, tolerance: number): boolean {
 
   if (shape.type !== "line") return false;
   return pointLineDist(point.x, point.y, shape.x1, shape.y1, shape.x2, shape.y2) <= tolerance;
 }
 
 function isPointInText(
-  point: Dimension,
+  cords: Dimension,
   shape: Shape,
   ctx: CanvasRenderingContext2D
 ): boolean {
   if (shape.type !== 'text') return false;
 
-  ctx.font = shape.font || "24px Arial";
+  ctx.font = shape.font || "24px 'Indie_Flower'";
   const width = ctx.measureText(shape.text).width;
-  const height = parseInt(shape.font || "24", 10); 
+  const height = parseInt(shape.font || "24", 10);
 
   return (
-    point.x >= shape.x &&
-    point.x <= shape.x + width &&
-    point.y >= shape.y &&
-    point.y <= shape.y + height
+    cords.x >= shape.x &&
+    cords.x <= shape.x + width &&
+    cords.y >= shape.y &&
+    cords.y <= shape.y + height
   );
 }
-

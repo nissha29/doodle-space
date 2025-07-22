@@ -68,4 +68,8 @@ export type Shape = {
     text: string;
     font: string;
     color: string;
+} | {
+    type: 'pencil',
+    points: Dimension[],
+    options?: any
 }

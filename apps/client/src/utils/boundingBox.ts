@@ -19,7 +19,7 @@ export function getHandlerPositions(box: any, pad = 4) {
 
 }
 
-export function getBoundingBox(shape: Shape) {
+export function getBoundingBox(shape: Shape, ctx: CanvasRenderingContext2D) {
   switch (shape.type) {
     case "rectangle":
       return {
@@ -58,7 +58,28 @@ export function getBoundingBox(shape: Shape) {
         maxY: Math.max(...ys),
       };
     }
-    default: return null;
+    case "text":
+      ctx.font = shape.font || "24px Arial";
+      const width = ctx.measureText(shape.text).width;
+      const height = parseInt((shape.font || "24"), 10);
+      return {
+        minX: shape.x,
+        minY: shape.y,
+        maxX: shape.x + width,
+        maxY: shape.y + height
+      }
+    case "pencil":
+      if (!shape.points || shape.points.length === 0) return null;
+      const xs = shape.points.map(p => p.x);
+      const ys = shape.points.map(p => p.y);
+      return {
+        minX: Math.min(...xs),
+        minY: Math.min(...ys),
+        maxX: Math.max(...xs),
+        maxY: Math.max(...ys)
+      };
+    default:
+      return null;
   }
 }
 

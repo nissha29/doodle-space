@@ -1,6 +1,7 @@
 import { ToolType } from "@/types/types";
 import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
+import { getText } from "../getDrawable";
 
 export const makeShape = (active: ToolType, start: Dimension, end: Dimension) => {
   let shape: Shape;
@@ -69,7 +70,34 @@ export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<
       if (index === selectedShapeIndex) {
 
         if (shape.type === 'text') {
-          return shape;
+          const newX = mouse.x - dragOffset.dx;
+          const newY = mouse.y - dragOffset.dy;
+
+          return {
+            ...shape,
+            x: newX,
+            y: newY,
+          };
+        }
+        else if (shape.type === 'pencil') {
+          const dx = mouse.x - dragOffset.dx;
+          const dy = mouse.y - dragOffset.dy;
+
+          const point0 = shape.points[0];
+          const moveDelta = {
+            dx: dx - point0.x,
+            dy: dy - point0.y,
+          };
+
+          const movedPoints = shape.points.map((pt) => ({
+            x: pt.x + moveDelta.dx,
+            y: pt.y + moveDelta.dy,
+          }));
+
+          return {
+            ...shape,
+            points: movedPoints,
+          };
         }
         const dim0 = shape.dimension[0];
         const dim1 = shape.dimension[1];
@@ -93,6 +121,24 @@ export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<
   );
 }
 
+export function textResize(initialShape: Shape, mouse: Dimension, shape: Shape) {
+  if (initialShape.type === 'text') {
+    const anchor = { x: initialShape.x, y: initialShape.y };
+    let newFontSize = parseInt(initialShape.font || "24", 10);
+
+    const height = Math.abs(mouse.y - anchor.y);
+    newFontSize = Math.max(12, Math.min(200, height));
+
+    const fontFamily = (initialShape.font || "24px Arial").split(" ").slice(1).join(" ") || "Arial";
+    const newFont = `${newFontSize}px ${fontFamily}`;
+
+    return {
+      ...shape,
+      font: newFont,
+    };
+  }
+}
+
 export function handleMouseMovementOnResize(
   mouse: Dimension,
   shapes: Shape[],
@@ -102,15 +148,19 @@ export function handleMouseMovementOnResize(
 ) {
   const initialShape = shapes[selectedShapeIndex];
   if (!initialShape) {
-    return; 
+    return;
   }
 
   setShapes((prev: Shape[]) =>
     prev.map((shape, index) => {
       if (index !== selectedShapeIndex) return shape;
-      if(initialShape.type === 'text'){
-        return shape;
+      if (initialShape.type === 'text') {
+        const newText = textResize(initialShape, mouse, shape);
+        return newText!;
+      } else if (initialShape.type === 'pencil') {
+        return initialShape;
       }
+
       const [start, end] = initialShape.dimension;
       let newStart = { ...start };
       let newEnd = { ...end };

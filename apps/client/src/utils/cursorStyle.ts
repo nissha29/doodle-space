@@ -5,7 +5,7 @@ export const cursorStyle = {
     'diamond': 'crosshair',
     'arrow': 'crosshair',
     'line': 'crosshair',
-    'pencil': 'crosshair',
+    'pencil': "url('/pencil.svg'), crosshair",
     'text': '',
     'eraser': "url('/eraser.svg'),pointer",
     'hand': 'grab',

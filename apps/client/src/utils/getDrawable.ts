@@ -1,5 +1,7 @@
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 import { RoughGenerator } from "roughjs/bin/generator";
+import { getStroke } from "perfect-freehand";
+import { getSvgPathFromStroke } from "./getSvgPathFromStroke";
 
 export const getDrawable = (shape: Shape, generator: RoughGenerator) => {
   if (!shape?.type) {
@@ -41,8 +43,21 @@ export const getDrawable = (shape: Shape, generator: RoughGenerator) => {
 export const getText = (ctx: CanvasRenderingContext2D, shape: Shape) => {
   if (shape.type !== 'text') return;
 
-  ctx.font = "24px 'Indie Flower'";
+  ctx.font = shape.font || "24px 'Indie Flower'";
   ctx.fillStyle = "#0ff";
   ctx.textBaseline = "top";
   ctx.fillText(shape.text, shape.x, shape.y);
 }
+
+export const freeDraw = (ctx: CanvasRenderingContext2D, points: Dimension[]) => {
+  const stroke = getStroke(points, {
+    size: 3,
+    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+  });
+
+  const path = getSvgPathFromStroke(stroke);
+  ctx.fillStyle = "#0ff";
+  ctx.fill(new Path2D(path));
+};

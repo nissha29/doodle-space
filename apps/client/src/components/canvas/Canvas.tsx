@@ -25,6 +25,9 @@ import rough from "roughjs";
 import { InputText } from "./InputText";
 import { getStroke } from "perfect-freehand";
 import { getSvgPathFromStroke } from "../../utils/getSvgPathFromStroke";
+import useUndoRedo from "@/hooks/useUndoRedo";
+import { useCurrentCanvasStore } from "@/store/useCurrentCanvasStore";
+import { useIndexStore } from "@/store/useIndexStore";
 
 const generator = rough.generator();
 
@@ -47,6 +50,24 @@ export default function Canvas() {
   const activeTool = useActiveStore((s) => s.activeTool);
   const [textInput, setTextInput] = useState<TextInput | null>(null);
   const [currentPoints, setCurrentPoints] = useState<Dimension[]>([]);
+  const currentCanvas = useCurrentCanvasStore((s) => s.currentCanvas);
+  const index = useIndexStore((s) => s.index);
+  const { addAction, undo, redo } = useUndoRedo();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const primary = e.ctrlKey || e.metaKey;
+      if (primary && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if (primary && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -155,6 +176,10 @@ export default function Canvas() {
     canvas.style.cursor = cursorStyle[activeTool];
   }, [activeTool]);
 
+  useEffect(() => {
+    setShapes(currentCanvas[index] || []);
+  }, [currentCanvas, index]);
+
   function getRelativeCoords(event: any) {
     const rect = event.target.getBoundingClientRect();
     return {
@@ -219,12 +244,12 @@ export default function Canvas() {
       if (!shape) return;
       setPreviewShape(shape);
     } else if (action === "move" && selectedShapeIndex !== null && dragOffset) {
-      console.log(action);
       handleMouseMovementOnMove(
         cords,
         setShapes,
         selectedShapeIndex,
-        dragOffset
+        dragOffset,
+        addAction
       );
     } else if (action === "resize" && selectedShapeIndex != null) {
       handleMouseMovementOnResize(
@@ -251,12 +276,21 @@ export default function Canvas() {
       currentPoints.length > 0
     ) {
       const freeDraw: Shape = { type: "pencil", points: currentPoints };
+      addAction([...shapes, freeDraw]);
       setShapes((prev) => [...prev, freeDraw]);
       setCurrentPoints([]);
     } else if (action === "draw") {
-      if (previewShape) setShapes((prev) => [...prev, previewShape]);
+      if (previewShape) {
+        addAction([...shapes, previewShape]);
+        setShapes((prev) => [...prev, previewShape]);
+      }
     } else if (action === "move") {
+      addAction(shapes);
       setSelectedShapeIndex(null);
+    } else if (action === "resize") {
+      addAction(shapes);
+    } else if (action === "erase") {
+      addAction(shapes);
     }
     setPreviewShape(null);
     setAction("none");

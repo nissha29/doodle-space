@@ -64,7 +64,7 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
   return shape;
 }
 
-export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<SetStateAction<Shape[]>>, selectedShapeIndex: number, dragOffset: { dx: number, dy: number }) {
+export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<SetStateAction<Shape[]>>, selectedShapeIndex: number, dragOffset: { dx: number, dy: number }, addAction: (shapes: Shape[]) => void) {
   setShapes((prev: Shape[]) =>
     prev.map((shape, index) => {
       if (index === selectedShapeIndex) {
@@ -114,6 +114,7 @@ export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<
           x: start.x + rel.x,
           y: start.y + rel.y,
         };
+        // addAction([...prev, shape]);
         return makeShape(shape.type, start, end)!;
       }
       return shape;

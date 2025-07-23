@@ -12,25 +12,6 @@ export interface IInput extends InputHTMLAttributes<HTMLInputElement> {
   className: string;
 }
 
-export type ShapeStore = {
-  existingShapes: Shape[];
-  addShape: (shape: Shape) => void;
-  setShapes: (shapes: Shape[]) => void;
-};
-
-export type CanvasInitParams = {
-  canvas: HTMLCanvasElement,
-  roomId: number,
-  shapesStore: UseBoundStore<StoreApi<ShapeStore>>,
-  socket: WebSocket | null
-}
-
-export type SocketStore = {
-  socket: WebSocket | null;
-  connect: (roomId: number, token: string) => void;
-  disconnect: () => void;
-};
-
 export type User = {
   name: string;
   email: string;
@@ -55,6 +36,16 @@ export type ShapeTypeStore = {
   setActive: (shapeType: ToolType) => void;
 }
 
+export type CurrentCanvasStore = {
+  currentCanvas: Shape[][];
+  setCurrentCanvas: (updater: Shape[][] | ((prev: Shape[][]) => Shape[][])) => void;
+};
+
+export type IndexStore = {
+  index: number,
+  setIndex: (updater: number | ((prev: number) => number)) => void;
+}
+
 export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase'
 
-export type TextInput = { cords: Dimension, value: string};
+export type TextInput = { cords: Dimension, value: string };

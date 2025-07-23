@@ -1,3 +1,4 @@
+import useUndoRedo from "@/hooks/useUndoRedo";
 import { TextInput } from "@/types/types";
 import { Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
@@ -6,13 +7,15 @@ export function InputText({
   textInput,
   setShapes,
   setTextInput,
-  shapes
+  shapes,
 }: {
   textInput: TextInput | null;
   setShapes: Dispatch<SetStateAction<Shape[]>>;
   setTextInput: Dispatch<SetStateAction<TextInput | null>>;
-  shapes: Shape[]
+  shapes: Shape[];
 }) {
+  const { addAction } = useUndoRedo();
+
   return (
     textInput && (
       <input
@@ -32,18 +35,21 @@ export function InputText({
               .reverse()
               .find((s) => s.type === "text");
 
-            const safeY = lastText ? lastText.y + DEFAULT_LINE_HEIGHT : textInput.cords.y;
+            const safeY = lastText
+              ? lastText.y + DEFAULT_LINE_HEIGHT
+              : textInput.cords.y;
 
-            setShapes((prev: any) => [
-              ...prev,
-              {
-                type: "text",
-                x: textInput.cords.x,
-                y: textInput.cords.y,
-                text: textInput.value,
-                font: "24px 'Indie Flower'",
-              },
-            ]);
+            const text: Shape = {
+              type: "text",
+              x: textInput.cords.x,
+              y: textInput.cords.y,
+              text: textInput.value,
+              font: "24px 'Indie Flower'",
+              color: ''
+            };
+            
+            addAction([...shapes, text])
+            setShapes((prev: any) => [...prev, text]);
           }
           setTextInput(null);
         }}

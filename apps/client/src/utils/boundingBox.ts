@@ -20,6 +20,8 @@ export function getHandlerPositions(box: any, pad = 4) {
 }
 
 export function getBoundingBox(shape: Shape, ctx: CanvasRenderingContext2D) {
+  if(! shape) return;
+  
   switch (shape.type) {
     case "rectangle":
       return {

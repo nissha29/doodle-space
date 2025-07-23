@@ -97,31 +97,7 @@ export default function Canvas() {
     });
 
     if (previewShape) {
-      if (previewShape.type === "pencil") {
-        const stroke = getStroke(previewShape.points, {
-          size: 3,
-          thinning: 0.5,
-          smoothing: 0.5,
-          streamline: 0.5,
-        });
-
-        const path = getSvgPathFromStroke(stroke);
-
-        ctx.fillStyle = "#0ff";
-        ctx.fill(new Path2D(path));
-
-        if (currentPoints.length > 0) {
-          const stroke = getStroke(currentPoints, {
-            size: 3,
-            thinning: 0.5,
-            smoothing: 0.5,
-            streamline: 0.5,
-          });
-          const path = getSvgPathFromStroke(stroke);
-          ctx.fillStyle = "#0ff";
-          ctx.fill(new Path2D(path));
-        }
-      } else if (previewShape.type === "text") {
+      if (previewShape.type === "text") {
         getText(ctx, previewShape);
       } else {
         const draw = getDrawable(previewShape, generator);
@@ -132,6 +108,36 @@ export default function Canvas() {
             roughCanvas.draw(draw);
           }
         }
+      }
+    }
+
+    if (
+      action === "draw" &&
+      activeTool === "pencil" &&
+      currentPoints.length > 0
+    ) {
+      const stroke = getStroke(currentPoints, {
+        size: 3,
+        thinning: 0.5,
+        smoothing: 0.5,
+        streamline: 0.5,
+      });
+
+      const path = getSvgPathFromStroke(stroke);
+
+      ctx.fillStyle = "#0ff";
+      ctx.fill(new Path2D(path));
+
+      if (currentPoints.length > 0) {
+        const stroke = getStroke(currentPoints, {
+          size: 3,
+          thinning: 0.5,
+          smoothing: 0.5,
+          streamline: 0.5,
+        });
+        const path = getSvgPathFromStroke(stroke);
+        ctx.fillStyle = "#0ff";
+        ctx.fill(new Path2D(path));
       }
     }
 
@@ -226,7 +232,8 @@ export default function Canvas() {
         shapes,
         setShapes,
         selectedShapeIndex,
-        resizeHandlerIndex
+        resizeHandlerIndex,
+        ctx
       );
     } else if (action === "erase") {
       const hitIndex = getShapeIndexOnPrecisePoint(cords, shapes, ctx);

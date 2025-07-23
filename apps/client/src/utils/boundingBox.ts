@@ -101,7 +101,7 @@ export function drawBoundingBoxAndHandlers(
     pos.paddedBox.maxY - pos.paddedBox.minY,
     {
       stroke: "#00cccc",
-      strokeWidth: 1.5,
+      strokeWidth: 0.7,
       roughness: 0.001,
       seed: 278,
       dashGap: 3,
@@ -115,11 +115,10 @@ export function drawBoundingBoxAndHandlers(
 
   handlers.forEach((h) => {
     const circleDrawable = generator.circle(h.x, h.y, handleSize, {
-      stroke: "#0ff",
-      fill: '#00FFFFaa',
-      fillStyle: 'solid',
+      stroke: "#00FFFFaa",
+      fillStyle: '',
       roughness: 0.001,
-      strokeWidth: 1.2,
+      strokeWidth: 3,
       seed: 155,
     });
     roughCanvas.draw(circleDrawable);

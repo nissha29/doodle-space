@@ -37,6 +37,9 @@ export default function isPointInShape(shape: Shape, point: Dimension, ctx?: Can
   if(ctx && shape.type === 'text'){
     return isPointInText(point, shape, ctx);
   }
+  else if(shape.type === 'pencil'){
+    return isPointOnDrawing(point, shape.points);
+  }
   switch (shape.type) {
     case "rectangle":
       return isPointInRect(point, shape);
@@ -146,4 +149,30 @@ function isPointInText(
     cords.y >= shape.y &&
     cords.y <= shape.y + height
   );
+}
+
+function isPointOnDrawing(cords: Dimension, points: Dimension[], tolerance = 8): boolean {
+  if (!points || points.length === 0) return false;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const dist = pointLineDistance(cords.x, cords.y, p1.x, p1.y, p2.x, p2.y);
+    if (dist <= tolerance) return true;
+  }
+  if (points.length === 1) {
+    const d = Math.sqrt((cords.x - points[0].x) ** 2 + (cords.y - points[0].y) ** 2);
+    if (d <= tolerance) return true;
+  }
+  return false;
+}
+
+function pointLineDistance(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  if (dx === 0 && dy === 0) return Math.sqrt((px - x1) ** 2 + (py - y1) ** 2);
+  const t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+  const clampedT = Math.max(0, Math.min(1, t));
+  const closeX = x1 + clampedT * dx;
+  const closeY = y1 + clampedT * dy;
+  return Math.sqrt((px - closeX) ** 2 + (py - closeY) ** 2);
 }

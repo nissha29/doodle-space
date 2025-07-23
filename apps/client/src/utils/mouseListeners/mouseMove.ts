@@ -1,7 +1,7 @@
 import { ToolType } from "@/types/types";
 import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
-import { getText } from "../getDrawable";
+import { getBoundingBox } from "../boundingBox";
 
 export const makeShape = (active: ToolType, start: Dimension, end: Dimension) => {
   let shape: Shape;
@@ -139,12 +139,61 @@ export function textResize(initialShape: Shape, mouse: Dimension, shape: Shape) 
   }
 }
 
+export function freeDrawResize(initialShape: Shape, mouse: Dimension, shape: Shape, resizeHandleIndex: number | null, ctx: CanvasRenderingContext2D) {
+  if (initialShape.type !== 'pencil') return shape;
+  const oldPoints = initialShape.points;
+
+  const box = getBoundingBox(initialShape, ctx);
+  const { minX, maxX, minY, maxY } = box!;
+
+  const oldWidth = maxX - minX || 1;
+  const oldHeight = maxY - minY || 1;
+
+  let newMinX = minX, newMinY = minY, newMaxX = maxX, newMaxY = maxY;
+  switch (resizeHandleIndex) {
+    case 0: 
+      newMinX = mouse.x;
+      newMinY = mouse.y;
+      break;
+    case 1: 
+      newMaxX = mouse.x;
+      newMinY = mouse.y;
+      break;
+    case 2:
+      newMaxX = mouse.x;
+      newMaxY = mouse.y;
+      break;
+    case 3:
+      newMinX = mouse.x;
+      newMaxY = mouse.y;
+      break;
+    default: 
+      newMaxX = mouse.x;
+      newMaxY = mouse.y;
+  }
+
+  const newWidth = newMaxX - newMinX || 1;
+  const newHeight = newMaxY - newMinY || 1;
+
+  const scaledPoints = oldPoints.map(p => ({
+    x: newMinX + ((p.x - minX) / oldWidth) * newWidth,
+    y: newMinY + ((p.y - minY) / oldHeight) * newHeight,
+  }));
+
+  return {
+    ...shape,
+    points: scaledPoints,
+  };
+}
+
+
 export function handleMouseMovementOnResize(
   mouse: Dimension,
   shapes: Shape[],
   setShapes: Dispatch<SetStateAction<Shape[]>>,
   selectedShapeIndex: number,
   resizeHandleIndex: number | null,
+  ctx: CanvasRenderingContext2D
 ) {
   const initialShape = shapes[selectedShapeIndex];
   if (!initialShape) {
@@ -158,7 +207,8 @@ export function handleMouseMovementOnResize(
         const newText = textResize(initialShape, mouse, shape);
         return newText!;
       } else if (initialShape.type === 'pencil') {
-        return initialShape;
+        const newDraw = freeDrawResize(initialShape, mouse, shape, resizeHandleIndex, ctx);
+        return newDraw!;
       }
 
       const [start, end] = initialShape.dimension;

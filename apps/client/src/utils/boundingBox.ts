@@ -1,4 +1,5 @@
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
+import { RoughGenerator } from "roughjs/bin/generator";
 
 export function getHandlerPositions(box: any, pad = 4) {
   const paddedBox = {
@@ -85,20 +86,19 @@ export function getBoundingBox(shape: Shape, ctx: CanvasRenderingContext2D) {
   }
 }
 
-import { RoughGenerator } from "roughjs/bin/generator";
-
 export function drawBoundingBoxAndHandlers(
   generator: RoughGenerator,
   roughCanvas: any,
   box: { minX: number, minY: number, maxX: number, maxY: number },
+  panOffset: Dimension,
   handleSize = 12
 ) {
 
   const pos = getHandlerPositions(box);
 
   const rectDrawable = generator.rectangle(
-    pos.paddedBox.minX,
-    pos.paddedBox.minY,
+    pos.paddedBox.minX - panOffset.x,
+    pos.paddedBox.minY - panOffset.y,
     pos.paddedBox.maxX - pos.paddedBox.minX,
     pos.paddedBox.maxY - pos.paddedBox.minY,
     {
@@ -108,7 +108,6 @@ export function drawBoundingBoxAndHandlers(
       seed: 278,
       dashGap: 3,
       bowing: 0.8,
-      fill: "rgba(0,0,0,0)",
     }
   );
   roughCanvas.draw(rectDrawable);
@@ -116,7 +115,7 @@ export function drawBoundingBoxAndHandlers(
   const handlers = pos.handlers;
 
   handlers.forEach((h) => {
-    const circleDrawable = generator.circle(h.x, h.y, handleSize, {
+    const circleDrawable = generator.circle(h.x - panOffset.x, h.y - panOffset.y, handleSize, {
       stroke: "#00FFFFaa",
       fillStyle: '',
       roughness: 0.001,

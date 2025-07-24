@@ -8,7 +8,7 @@ import {
   drawBoundingBoxAndHandlers,
 } from "@/utils/boundingBox";
 import { cursorStyle } from "@/utils/cursorStyle";
-import { getDrawable, getText } from "@/utils/getDrawable";
+import { freeDraw, getDrawable, getText } from "@/utils/getDrawable";
 import {
   handleMouseMovementOnMove,
   handleMouseMovementOnResize,
@@ -23,8 +23,6 @@ import { Dimension, Shape } from "@repo/common/types";
 import React, { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
 import { InputText } from "./InputText";
-import { getStroke } from "perfect-freehand";
-import { getSvgPathFromStroke } from "../../utils/getSvgPathFromStroke";
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { useCurrentCanvasStore } from "@/store/useCurrentCanvasStore";
 import { useIndexStore } from "@/store/useIndexStore";
@@ -53,6 +51,8 @@ export default function Canvas() {
   const currentCanvas = useCurrentCanvasStore((s) => s.currentCanvas);
   const index = useIndexStore((s) => s.index);
   const { addAction, undo, redo } = useUndoRedo();
+  const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
+  const [panStart, setPanStart] = useState<Dimension | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,33 +80,15 @@ export default function Canvas() {
 
     shapes.forEach((shape) => {
       if (shape.type === "pencil") {
-        const stroke = getStroke(shape.points, {
-          size: 3,
-          thinning: 0.5,
-          smoothing: 0.5,
-          streamline: 0.5,
-        });
-
-        const path = getSvgPathFromStroke(stroke);
-
-        ctx.fillStyle = "#0ff";
-        ctx.fill(new Path2D(path));
+        freeDraw(ctx, shape.points, panOffset);
 
         if (currentPoints.length > 0) {
-          const stroke = getStroke(currentPoints, {
-            size: 3,
-            thinning: 0.5,
-            smoothing: 0.5,
-            streamline: 0.5,
-          });
-          const path = getSvgPathFromStroke(stroke);
-          ctx.fillStyle = "#0ff";
-          ctx.fill(new Path2D(path));
+          freeDraw(ctx, shape.points, panOffset);
         }
       } else if (shape.type === "text") {
-        getText(ctx, shape);
+        getText(ctx, shape, panOffset);
       } else {
-        const draw = getDrawable(shape, generator);
+        const draw = getDrawable(shape, generator, panOffset);
         if (draw) {
           if (Array.isArray(draw)) {
             draw.forEach((d) => roughCanvas.draw(d));
@@ -119,9 +101,9 @@ export default function Canvas() {
 
     if (previewShape) {
       if (previewShape.type === "text") {
-        getText(ctx, previewShape);
+        getText(ctx, previewShape, panOffset);
       } else {
-        const draw = getDrawable(previewShape, generator);
+        const draw = getDrawable(previewShape, generator, panOffset);
         if (draw) {
           if (Array.isArray(draw)) {
             draw.forEach((d) => roughCanvas.draw(d));
@@ -137,28 +119,10 @@ export default function Canvas() {
       activeTool === "pencil" &&
       currentPoints.length > 0
     ) {
-      const stroke = getStroke(currentPoints, {
-        size: 3,
-        thinning: 0.5,
-        smoothing: 0.5,
-        streamline: 0.5,
-      });
-
-      const path = getSvgPathFromStroke(stroke);
-
-      ctx.fillStyle = "#0ff";
-      ctx.fill(new Path2D(path));
+      freeDraw(ctx, currentPoints, panOffset);
 
       if (currentPoints.length > 0) {
-        const stroke = getStroke(currentPoints, {
-          size: 3,
-          thinning: 0.5,
-          smoothing: 0.5,
-          streamline: 0.5,
-        });
-        const path = getSvgPathFromStroke(stroke);
-        ctx.fillStyle = "#0ff";
-        ctx.fill(new Path2D(path));
+        freeDraw(ctx, currentPoints, panOffset);
       }
     }
 
@@ -166,9 +130,9 @@ export default function Canvas() {
       const shape = shapes[selectedShapeIndex];
       const box = getBoundingBox(shape, ctx);
       if (!box) return;
-      drawBoundingBoxAndHandlers(generator, roughCanvas, box);
+      drawBoundingBoxAndHandlers(generator, roughCanvas, box, panOffset);
     }
-  }, [shapes, previewShape, activeTool, selectedShapeIndex, currentPoints]);
+  }, [shapes, previewShape, activeTool, selectedShapeIndex, currentPoints, panOffset]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -183,8 +147,8 @@ export default function Canvas() {
   function getRelativeCoords(event: any) {
     const rect = event.target.getBoundingClientRect();
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
+      x: event.clientX - rect.left + panOffset.x,
+      y: event.clientY - rect.top + panOffset.y,
     };
   }
 
@@ -195,7 +159,10 @@ export default function Canvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    if (activeTool === "select") {
+    if (activeTool === "pan") {
+      setPanStart(cords);
+      setAction("pan");
+    } else if (activeTool === "select") {
       const handlerIndex = checkIsCursorOnHandlers(
         cords,
         selectedShapeIndex,
@@ -237,7 +204,16 @@ export default function Canvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    if (action === "draw" && activeTool === "pencil") {
+    if (action === "pan" && panStart) {
+      const dx = cords.x - panStart.x;
+      const dy = cords.y - panStart.y;
+
+      setPanOffset((prev) => ({
+        x: prev.x - dx,
+        y: prev.y - dy,
+      }));
+      setPanStart(cords);
+    } else if (action === "draw" && activeTool === "pencil") {
       setCurrentPoints((prev) => [...prev, cords]);
     } else if (action === "draw") {
       const shape = makeShape(activeTool, start, cords);
@@ -249,7 +225,6 @@ export default function Canvas() {
         setShapes,
         selectedShapeIndex,
         dragOffset,
-        addAction
       );
     } else if (action === "resize" && selectedShapeIndex != null) {
       handleMouseMovementOnResize(
@@ -270,7 +245,10 @@ export default function Canvas() {
   };
 
   const handleMouseUp = () => {
-    if (
+    if (action === "pan") {
+      setPanStart(null);
+      setAction("none");
+    } else if (
       action === "draw" &&
       activeTool === "pencil" &&
       currentPoints.length > 0

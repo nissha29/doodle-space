@@ -83,8 +83,8 @@ export function SelectTool() {
           </Tool>
 
           <Tool
-            onClick={() => selectedTool("hand")}
-            name="hand"
+            onClick={() => selectedTool("pan")}
+            name="pan"
             toolTip="Hand - Panning tool"
           >
             <Hand />

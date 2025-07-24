@@ -29,7 +29,7 @@ export interface ToolProps {
   onClick?: () => void;
 }
 
-export type ToolType = 'rectangle' | 'circle' | 'diamond' | 'arrow' | 'line' | 'pencil' | 'text' | 'eraser' | 'hand' | 'select'
+export type ToolType = 'rectangle' | 'circle' | 'diamond' | 'arrow' | 'line' | 'pencil' | 'text' | 'eraser' | 'pan' | 'select'
 
 export type ShapeTypeStore = {
   activeTool: ToolType;
@@ -46,6 +46,6 @@ export type IndexStore = {
   setIndex: (updater: number | ((prev: number) => number)) => void;
 }
 
-export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase'
+export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase' | 'pan'
 
 export type TextInput = { cords: Dimension, value: string };

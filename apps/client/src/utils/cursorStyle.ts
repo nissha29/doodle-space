@@ -8,6 +8,6 @@ export const cursorStyle = {
     'pencil': "url('/pencil.svg'), crosshair",
     'text': '',
     'eraser': "url('/eraser.svg'),pointer",
-    'hand': 'grab',
+    'pan': 'grab',
     'select': 'move',
 }

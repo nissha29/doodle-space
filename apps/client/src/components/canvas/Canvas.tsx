@@ -26,6 +26,9 @@ import { InputText } from "./InputText";
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { useCurrentCanvasStore } from "@/store/useCurrentCanvasStore";
 import { useIndexStore } from "@/store/useIndexStore";
+import { Zoom } from "./Zoom";
+import { UndoRedo } from "./UndoRedo";
+import { useZoom } from "@/hooks/useZoom";
 
 const generator = rough.generator();
 
@@ -51,6 +54,7 @@ export default function Canvas() {
   const currentCanvas = useCurrentCanvasStore((s) => s.currentCanvas);
   const index = useIndexStore((s) => s.index);
   const { addAction, undo, redo } = useUndoRedo();
+  const { zoom, zoomIn, zoomOut, resetZoom } = useZoom();
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
 
@@ -158,8 +162,8 @@ export default function Canvas() {
   function getRelativeCoords(event: any) {
     const rect = event.target.getBoundingClientRect();
     return {
-      x: event.clientX - rect.left + panOffset.x,
-      y: event.clientY - rect.top + panOffset.y,
+      x: (event.clientX - rect.left) + panOffset.x,
+      y: (event.clientY - rect.top) + panOffset.y,
     };
   }
 
@@ -335,6 +339,10 @@ export default function Canvas() {
       </div>
       <div className="fixed top-6 right-10 z-20">
         <SelectTool />
+      </div>
+      <div>
+        {/* <Zoom zoom={zoom} zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom}/> */}
+        <UndoRedo />
       </div>
     </div>
   );

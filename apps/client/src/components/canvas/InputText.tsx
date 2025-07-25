@@ -23,8 +23,8 @@ export function InputText({
       <input
         className="absolute text-[#0ff] bg-transparent border-[#0ff] border-dashed p-5 outline-none text-2xl font-[Indie_Flower]"
         style={{
-          top: textInput.cords.y - panOffset.y,
-          left: textInput.cords.x - panOffset.x,
+          top: textInput.cords.y - panOffset.y - 25,
+          left: textInput.cords.x - panOffset.x - 25,
           position: "absolute",
           zIndex: 10,
         }}

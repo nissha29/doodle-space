@@ -170,7 +170,7 @@ export function Eraser() {
   );
 }
 
-export function Hand() {
+export function Pan() {
   const activeTool = useActiveStore((s) => s.activeTool);
   return (
     <svg
@@ -181,7 +181,7 @@ export function Hand() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={`${activeTool === "hand" ? "2" : "1"}`}
+      strokeWidth={`${activeTool === "pan" ? "2" : "1"}`}
       strokeLinecap="round"
       strokeLinejoin="round"
       className="lucide lucide-hand-icon lucide-hand"
@@ -211,6 +211,85 @@ export function Select() {
     >
       <path d="M12.586 12.586 19 19" />
       <path d="M3.688 3.037a.497.497 0 0 0-.651.651l6.5 15.999a.501.501 0 0 0 .947-.062l1.569-6.083a2 2 0 0 1 1.448-1.479l6.124-1.579a.5.5 0 0 0 .063-.947z" />
+    </svg>
+  );
+}
+
+export function Plus() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-plus-icon lucide-plus hover:scale-110"
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+export function Minus() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-minus-icon lucide-minus hover:scale-110"
+    >
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function Undo() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-undo2-icon lucide-undo-2 hover:scale-110"
+    >
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+    </svg>
+  );
+}
+
+export function Redo() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-redo2-icon lucide-redo-2 hover:scale-110"
+    >
+      <path d="m15 14 5-5-5-5" />
+      <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" />
     </svg>
   );
 }

@@ -78,6 +78,8 @@ export default function Canvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const roughCanvas = rough.canvas(canvas);
 
+    ctx.save();
+
     shapes.forEach((shape) => {
       if (shape.type === "pencil") {
         freeDraw(ctx, shape.points, panOffset);
@@ -132,7 +134,16 @@ export default function Canvas() {
       if (!box) return;
       drawBoundingBoxAndHandlers(generator, roughCanvas, box, panOffset);
     }
-  }, [shapes, previewShape, activeTool, selectedShapeIndex, currentPoints, panOffset]);
+
+    ctx.restore();
+  }, [
+    shapes,
+    previewShape,
+    activeTool,
+    selectedShapeIndex,
+    currentPoints,
+    panOffset,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -160,7 +171,7 @@ export default function Canvas() {
     if (!ctx) return;
 
     if (activeTool === "pan") {
-      setPanStart(cords);
+      setPanStart({ x: event.clientX, y: event.clientY });
       setAction("pan");
     } else if (activeTool === "select") {
       const handlerIndex = checkIsCursorOnHandlers(
@@ -205,14 +216,13 @@ export default function Canvas() {
     if (!ctx) return;
 
     if (action === "pan" && panStart) {
-      const dx = cords.x - panStart.x;
-      const dy = cords.y - panStart.y;
-
+      const dx = event.clientX - panStart.x;
+      const dy = event.clientY - panStart.y;
       setPanOffset((prev) => ({
         x: prev.x - dx,
         y: prev.y - dy,
       }));
-      setPanStart(cords);
+      setPanStart({ x: event.clientX, y: event.clientY });
     } else if (action === "draw" && activeTool === "pencil") {
       setCurrentPoints((prev) => [...prev, cords]);
     } else if (action === "draw") {
@@ -224,7 +234,7 @@ export default function Canvas() {
         cords,
         setShapes,
         selectedShapeIndex,
-        dragOffset,
+        dragOffset
       );
     } else if (action === "resize" && selectedShapeIndex != null) {
       handleMouseMovementOnResize(
@@ -314,6 +324,7 @@ export default function Canvas() {
         setShapes={setShapes}
         setTextInput={setTextInput}
         shapes={shapes}
+        panOffset={panOffset}
       />
 
       <div className="absolute top-6 left-10">

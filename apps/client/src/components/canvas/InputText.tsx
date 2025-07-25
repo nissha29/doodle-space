@@ -1,6 +1,6 @@
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { TextInput } from "@/types/types";
-import { Shape } from "@repo/common/types";
+import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
 
 export function InputText({
@@ -8,11 +8,13 @@ export function InputText({
   setShapes,
   setTextInput,
   shapes,
+  panOffset
 }: {
   textInput: TextInput | null;
   setShapes: Dispatch<SetStateAction<Shape[]>>;
   setTextInput: Dispatch<SetStateAction<TextInput | null>>;
   shapes: Shape[];
+  panOffset: Dimension
 }) {
   const { addAction } = useUndoRedo();
 
@@ -21,8 +23,8 @@ export function InputText({
       <input
         className="absolute text-[#0ff] bg-transparent border-[#0ff] border-dashed p-5 outline-none text-2xl font-[Indie_Flower]"
         style={{
-          top: textInput.cords.y,
-          left: textInput.cords.x,
+          top: textInput.cords.y - panOffset.y,
+          left: textInput.cords.x - panOffset.x,
           position: "absolute",
           zIndex: 10,
         }}

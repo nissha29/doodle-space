@@ -19,5 +19,5 @@ export function useZoom() {
     setZoom(1);
   };
 
-  return { zoom, zoomIn, zoomOut, resetZoom };
+  return { zoom, setZoom, zoomIn, zoomOut, resetZoom };
 }

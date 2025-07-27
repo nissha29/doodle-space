@@ -12,10 +12,13 @@ export default function Navbar() {
         </div>
       </div>
       <div className="flex gap-16 justify-center items-center text-xl z-10">
-        <Link href="" className={navBarLinkStyles}>
+        <Link href="/" className={navBarLinkStyles}>
           Home
         </Link>
-        <Link href="" className={navBarLinkStyles}>
+        <Link href="#demo" className={navBarLinkStyles}>
+          Demo
+        </Link>
+        <Link href="#features" className={navBarLinkStyles}>
           {" "}
           Features
         </Link>

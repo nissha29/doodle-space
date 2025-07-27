@@ -1,0 +1,25 @@
+<svg width="180" height="150" viewBox="0 0 180 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M20 120 Q30 60 80 60 Q140 60 140 25"
+    stroke="white"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-dasharray="18 14"
+    fill="none"
+  />
+
+  <path
+    d="M138 27 L148 37"
+    stroke="white"
+    stroke-width="1"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <path
+    d="M138 27 L128 37"
+    stroke="white"
+    stroke-width="1"
+    stroke-linecap="round"
+    fill="none"
+  />
+</svg>

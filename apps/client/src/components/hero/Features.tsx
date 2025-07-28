@@ -1,7 +1,17 @@
 import { cn } from "@/lib/utils";
 
 import { Infinity, Rocket, History, Brush, Hourglass, Expand } from "lucide-react";
+
 export function Features() {
+  return <div className="mt-28 flex flex-col justify-center items-center gap-5">
+    <div className="text-5xl text-white">
+      <span className="bg-cyan-300 px-3 text-black">Discover</span> What You Can Do
+    </div>
+    <FeaturesSection />
+  </div>
+}
+
+export function FeaturesSection() {
   const features = [
     {
       title: "Infinite Canvas",

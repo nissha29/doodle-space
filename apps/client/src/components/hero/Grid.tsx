@@ -29,7 +29,7 @@ export default function Grid() {
   return (
     <div>
       <div>
-        <div className="flex gap-1.5 mt-14">
+        <div className="flex gap-1.5 mt-28">
 
           <div className="flex flex-col gap-1.5">
             <div className="flex gap-1.5">

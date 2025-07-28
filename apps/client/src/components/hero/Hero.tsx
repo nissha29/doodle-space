@@ -10,6 +10,8 @@ import Grid from "./Grid";
 import Video from "./Video";
 import { LineSquiggle } from "lucide-react";
 import { Features } from "./Features";
+import { CTA } from "./Cta";
+import { Footer } from "./Footer";
 
 export default function Hero() {
   const router = useRouter();
@@ -33,7 +35,7 @@ export default function Hero() {
         </div>
         <div className="py-6 px-10 border-x border-neutral-700 border-dashed">
           <Navbar />
-          <div className="flex flex-col gap-16 justify-center items-center ">
+          <div className="flex flex-col justify-center items-center ">
             <div className="mt-20 pr-10">
               <div className="py-1 rounded-full bg-white/95 flex items-center px-1 gap-2 text-black">
                 <div className="bg-cyan-300 rounded-full px-6 py-1 font-semibold">
@@ -48,7 +50,7 @@ export default function Hero() {
                 </Link>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center gap-8">
+            <div className="flex flex-col justify-center items-center gap-8 mt-14">
               <div className="text-7xl w-6xl text-center tracking-wider leading-24">
                 Every <span className="text-cyan-400">ძထძℓꫀ</span> begins with a
                 spark illuminating creativity
@@ -67,12 +69,9 @@ export default function Hero() {
             </div>
             <Grid />
             <Video />
-            <div className="mt-14 mb-60 flex flex-col justify-center items-center gap-5">
-              <div className="text-5xl text-white">
-                <span className="bg-cyan-300 px-3 text-black">Discover</span> What You Can Do
-              </div>
-              <Features />
-            </div>
+            <Features />
+            <CTA />
+            <Footer />
           </div>
         </div>
       </div>

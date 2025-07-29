@@ -21,7 +21,7 @@ export default function Hero() {
         <Background />
       </div>
       <div
-        className="w-full h-screen px-64 py-6"
+        className="w-full h-screen 2xl:px-36 xl:px-32 lg:px-14 md:px-20 py-6"
         style={{ backgroundImage: "url('/bg.svg')" }}
       >
         <div className="relative">
@@ -33,7 +33,7 @@ export default function Hero() {
           </div>
           <div className="absolute text-neutral-500 font-extralight -left-7"><LineSquiggle className="w-14 h-14 rotate-45" strokeWidth="1" /></div>
         </div>
-        <div className="py-6 px-10 border-x border-neutral-700 border-dashed">
+        <div className="py-6 md:px-10 lg:px-6 xl:px-10 border-x border-neutral-700 border-dashed">
           <Navbar />
           <div className="flex flex-col justify-center items-center ">
             <div className="mt-20 pr-10">

@@ -29,12 +29,12 @@ export default function Grid() {
   return (
     <div>
       <div>
-        <div className="flex gap-1.5 mt-28">
+        <div className="flex flex-col sm:flex-row gap-1.5 mt-28">
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 px:20 sm:px-0">
             <div className="flex gap-1.5">
             
-              <div className="relative w-60 h-60">
+              <div className="relative lg:w-60 lg:h-60 md:w-52 md:h-52 sm:w-44 sm:h-44 w-40 h-40">
                 <Image
                   src="/girlie.png"
                   alt="girlie"
@@ -45,7 +45,7 @@ export default function Grid() {
                 <Overlay show={activeIndex === imgIdx++} />
               </div>
               
-              <div className="relative w-60 h-60">
+              <div className="relative lg:w-60 lg:h-60 md:w-52 md:h-52 sm:w-44 sm:h-44 w-40 h-40">
                 <Image
                   src="/flowers.png"
                   alt="image"
@@ -63,7 +63,7 @@ export default function Grid() {
                   src="/couple.png"
                   alt="couple"
                   fill
-                  className="object-cover w-full rounded-b-xl"
+                  className="object-cover w-full sm:rounded-b-xl"
                   sizes="100vw"
                 />
                 <Overlay show={activeIndex === imgIdx++} />
@@ -71,20 +71,20 @@ export default function Grid() {
             </div>
           </div>
     
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-row sm:flex-col gap-1.5">
 
-            <div className="relative w-60 h-72">
+            <div className="relative lg:w-60 lg:h-72 md:w-52 md:h-60 sm:w-44 sm:h-60 w-full h-44">
               <Image
                 src="/boy.png"
                 alt="boy"
                 fill
-                className="object-cover rounded-t-xl"
+                className="object-cover sm:rounded-t-xl rounded-b-xl"
                 sizes="240px"
               />
               <Overlay show={activeIndex === imgIdx++} />
             </div>
 
-            <div className="relative w-60 h-48">
+            <div className="relative w-full lg:h-48 md:h-52 sm:h-44">
               <Image
                 src="/tea-boy.png"
                 alt="image"

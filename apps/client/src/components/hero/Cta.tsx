@@ -7,33 +7,41 @@ import React, { useRef, useState, useEffect } from "react";
 export const CTA = () => {
   const router = useRouter();
   return (
-    <div className="w-full px-40">
-      <BackgroundBeamsWithCollision className="">
-        <div className="relative flex flex-col items-center justify-center min-h-screen w-full px-20">
+    <div className="w-full px-0.5 xl:px-5 2xl:px-52">
+      <BackgroundBeamsWithCollision>
+        <div className="relative flex flex-col items-center justify-center min-h-[60vh] sm:min-h-[80vh] md:min-h-screen w-full px-4 sm:px-6 md:px-12">
           <div
             className="absolute inset-0 z-0"
             style={{
               background: "transparent",
-              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)",
-              backgroundSize: "20px 20px",
+              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)",
+              backgroundSize: "12px 12px", 
               backgroundPosition: "center",
               backgroundRepeat: "repeat"
             }}
           />
 
-          <section className="relative z-10 flex flex-col items-center justify-center py-6">
-            <h2 className="text-4xl font-bold mb-4">Ready to Start Doodling?</h2>
-            <p className="mb-6 text-lg text-neutral-400">
+          <section className="relative z-10 flex flex-col items-center justify-center py-12 sm:py-20 md:py-6 w-full max-w-2xl mx-auto">
+            <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-center leading-tight px-2">
+              Ready to Start Doodling?
+            </h2>
+
+            <p className="mb-6 sm:mb-8 text-sm xs:text-base sm:text-lg text-center text-neutral-400 max-w-xs xs:max-w-sm sm:max-w-md px-4 leading-relaxed">
               Experience real-time drawing with friends on a limitless canvas. No barriers, just creativity.
             </p>
-            <button onClick={() => router.push('/signin')} className="bg-cyan-300 text-black px-12 py-3 rounded-full text-xl mt-10 hover:cursor-pointer hover:scale-110 hover:bg-cyan-400 transition-all duration-300 ease-in-out shadow-md shadow-cyan-300">
-              Start Drawing for Free
+
+            <button
+              onClick={() => router.push('/signin')}
+              className="bg-cyan-300 text-black px-8 xs:px-8 sm:px-12 py-3 xs:py-3.5 sm:py-3 rounded-full text-sm xs:text-base sm:text-xl mt-4 sm:mt-6 md:mt-10 hover:cursor-pointer hover:scale-105 hover:bg-cyan-400 transition-all duration-300 ease-in-out shadow-md shadow-cyan-300 font-medium"
+            >
+              <span className="xs:hidden">Start Drawing</span>
+              <span className="hidden xs:inline">Start Drawing for Free</span>
             </button>
           </section>
         </div>
       </BackgroundBeamsWithCollision>
     </div>
-  )
+  );
 }
 
 export const BackgroundBeamsWithCollision = ({

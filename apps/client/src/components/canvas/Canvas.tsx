@@ -20,7 +20,7 @@ import {
   getShapeIndexOnPrecisePoint,
 } from "@/utils/mouseListeners/mouseDown";
 import { Dimension, Shape } from "@repo/common/types";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import rough from "roughjs";
 import { InputText } from "./InputText";
 import useUndoRedo from "@/hooks/useUndoRedo";
@@ -57,6 +57,35 @@ export default function Canvas() {
   const { zoom, zoomIn, zoomOut, resetZoom } = useZoom();
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
+
+  useLayoutEffect(() => {
+    function resizeCanvas() {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const parent = canvas.parentElement;
+      if (!parent) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const w = parent.clientWidth;
+      const h = parent.clientHeight;
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
+        ctx.scale(dpr, dpr);
+      }
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -311,7 +340,7 @@ export default function Canvas() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative overflow-y-hidden">
       <canvas
         ref={canvasRef}
         width={1920}

@@ -14,7 +14,7 @@ export const CTA = () => {
             className="absolute inset-0 z-0"
             style={{
               background: "transparent",
-              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)",
+              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)",
               backgroundSize: "12px 12px", 
               backgroundPosition: "center",
               backgroundRepeat: "repeat"

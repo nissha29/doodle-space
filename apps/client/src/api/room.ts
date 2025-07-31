@@ -1,12 +1,31 @@
 import { HTTP_URL } from "@/config";
 import axios, { AxiosError } from "axios";
 
+export const createRoom = async (roomData: { linkId: string }) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('no token');
+            return;
+        }
+        const response = await axios.post(`${HTTP_URL}/room/create`, roomData, {
+            headers: {
+                authorization: token,
+            }
+        });
+        return response.data.result;
+    } catch (error) {
+        const err = error as AxiosError<{ error: string }>;
+        throw new Error(err.response?.data.error || 'Room creation failed');
+    }
+}
+
 export const getExistingShapes = async (roomId: number) => {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
             console.log('no token');
-            return ;
+            return;
         }
         const response = await axios.get(`${HTTP_URL}/room/shapes/${roomId}`, {
             headers: {

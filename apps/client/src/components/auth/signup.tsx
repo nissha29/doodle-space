@@ -48,10 +48,10 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen py-24 px-10">
+    <div className="flex flex-col justify-center items-center w-screen h-screen py-24 px-3 sm:px-10">
       <div className="flex flex-col gap-5 items-start w-80 sm:w-sm">
         <div className="text-3xl sm:text-4xl text-white tracking-normal flex gap-2 justify-center items-center">
-          Welcome to <span className="text-cyan-300">DoodleSpace</span> <ArrowRight size={24} />
+          Welcome to DoodleSpace <ArrowRight size={24} />
         </div>
         <div className="text-xl text-neutral-400">
           Create your doodle space account and start drawing

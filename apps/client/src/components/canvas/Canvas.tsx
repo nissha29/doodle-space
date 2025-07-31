@@ -30,13 +30,35 @@ import { Zoom } from "./Zoom";
 import { UndoRedo } from "./UndoRedo";
 import { useZoom } from "@/hooks/useZoom";
 
+function getInitialShapes(): Shape[] {
+  const rawCanvas = localStorage.getItem('current-canvas');
+  const rawIndex = localStorage.getItem('index');
+  if (!rawCanvas || !rawIndex) return [];
+
+  try {
+    const parsedCanvas = JSON.parse(rawCanvas);
+    const parsedIndex = JSON.parse(rawIndex);
+    const idx = parsedIndex.state?.index;
+    const allCanvases = parsedCanvas.state?.currentCanvas as Shape[][] | undefined;
+
+    if (Array.isArray(allCanvases) && typeof idx === 'number') {
+      return allCanvases[idx] ?? [];
+    }
+  } catch {
+  
+  }
+
+  return [];
+}
+
+
 const generator = rough.generator();
 
 export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [action, setAction] = useState<Action>("none");
   const [start, setStart] = useState({ x: 0, y: 0 });
-  const [shapes, setShapes] = useState<Shape[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>(getInitialShapes);
   const [previewShape, setPreviewShape] = useState<Shape | null>(null);
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
@@ -77,7 +99,7 @@ export default function Canvas() {
 
       const ctx = canvas.getContext("2d");
       if (ctx) {
-        ctx.setTransform(1, 0, 0, 1, 0, 0); 
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
       }
     }

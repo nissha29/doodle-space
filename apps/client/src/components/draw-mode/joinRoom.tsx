@@ -1,10 +1,24 @@
-import { useRouter } from "next/navigation";
 import Button from "../forms/button";
 import Input from "../forms/input";
 import { X } from "lucide-react";
+import useSocket from "@/hooks/useSocket";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function JoinRoom({ setJoinRoom }: any) {
-  const router = useRouter();
+  const [link, setLink] = useState("");
+  const { loading, joinRoom } = useSocket();
+
+  function getRoomIdFromLink() {
+    try {
+      const url = new URL(link.trim());
+      const parts = url.pathname.split('/').filter(Boolean);
+      return parts[parts.length - 1];
+    } catch (e) {
+      console.error("Invalid URL format:", e);
+    }
+  }
+
   return (
     <div
       className="fixed inset-0 w-full h-full flex justify-center items-center z-50 bg-black/50 backdrop-blur-sm"
@@ -26,9 +40,18 @@ export default function JoinRoom({ setJoinRoom }: any) {
               label="Room Link"
               placeholder="Enter Room Link"
               className=""
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
             />
-            <Button onClick={() => router.push("/canvas/room/123")}>
-              Join Room
+            <Button onClick={() => {
+              const roomId = getRoomIdFromLink();
+              if (roomId) {
+                joinRoom(roomId);
+              } else {
+                toast.error("Invalid room link. Please check the format.");
+              }
+            }}>
+              {loading ? "Joining..." : "Join Room"}
             </Button>
           </div>
         </div>

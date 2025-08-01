@@ -4,7 +4,7 @@ import { auth } from "../middlewares/auth.middleware.js";
 
 const roomRouter: Router = Router();
 
-roomRouter.post('/', auth, createRoom);
+roomRouter.post('/create', auth, createRoom);
 roomRouter.get('/shapes/:roomId', auth, roomShapes);
 
 export default roomRouter;

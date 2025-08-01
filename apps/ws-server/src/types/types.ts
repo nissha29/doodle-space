@@ -4,7 +4,7 @@ export interface IUser {
   ws: WebSocket,
   userId: string,
   username: string,
-  rooms: number[]
+  rooms: string[]
 }
 
 export enum MessageType {

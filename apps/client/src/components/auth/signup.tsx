@@ -60,7 +60,7 @@ export default function Signup() {
           <div className="flex sm:gap-4 flex-col sm:flex-row gap-5">
             <Input
               {...register('name')}
-              label="Name"
+              label="Name"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
               type="text"
               placeholder="John Doe"
               className="w-80 sm:w-36"

@@ -11,13 +11,13 @@ const addNewConnection = (ws: WebSocket, userId: string, username: string) => {
     users.push({ ws, userId, username, rooms: [] })
 }
 
-const roomExists = async (roomId: number) => {
+const roomExists = async (roomId: string) => {
     try {
-        if (!roomId || typeof (roomId) !== 'number') {
+        if (!roomId || typeof (roomId) !== 'string') {
             return false;
         }
         const room = await prismaClient.room.findFirst({
-            where: { id: roomId }
+            where: { linkId: roomId }
         })
 
         if (!room) {
@@ -30,7 +30,7 @@ const roomExists = async (roomId: number) => {
     }
 }
 
-const joinRoom = async (userId: string, roomId: number) => {
+const joinRoom = async (userId: string, roomId: string) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`)
         return;
@@ -45,11 +45,11 @@ const joinRoom = async (userId: string, roomId: number) => {
     console.log('joined');
     user.ws.send(JSON.stringify({
         type: 'joinRoom',
-        message: `${user.username} Room joined successfully`
+        message: `${user.username} has joined room`
     }))
 }
 
-const leaveRoom = async (userId: string, roomId: number) => {
+const leaveRoom = async (userId: string, roomId: string) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`);
     }
@@ -63,7 +63,7 @@ const leaveRoom = async (userId: string, roomId: number) => {
     user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
 }
 
-const sendChatToRoom = async (userId: string, shape: Shape, roomId: number) => {
+const sendChatToRoom = async (userId: string, shape: Shape, roomId: string) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`);
         return;

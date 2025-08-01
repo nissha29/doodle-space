@@ -2,21 +2,21 @@ import { useState } from "react";
 import Button from "../forms/button";
 import Input from "../forms/input";
 import { X, Copy, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
 import { createRoom } from "@/api/room";
 import toast from "react-hot-toast";
+import useSocket from "@/hooks/useSocket";
 
 export default function CreateRoom({ setCreateRoom }: any) {
   const [roomLink, setRoomLink] = useState("");
   const [isCopied, setIsCopied] = useState(false);
   const [isRoomCreated, setIsRoomCreated] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [loader, setLoader] = useState(false);
+  const { loading, joinRoom } = useSocket();
 
   const generateRoomLink = async () => {
     try {
-      setLoading(true);
+      setLoader(true);
       const roomId = nanoid(15);
       const link = `${window.location.origin}/canvas/room/${roomId}`;
       setRoomLink(link);
@@ -24,10 +24,10 @@ export default function CreateRoom({ setCreateRoom }: any) {
       await createRoom(roomData);
       toast.success("Room created successfully! You can now share the link with others.");
       setIsRoomCreated(true);
-      setLoading(false);
+      setLoader(false);
     } catch (error: any) {
       toast.error(error.message || "Oops! Something went wrong during room creation.");
-      setLoading(false);
+      setLoader(false);
     }
   };
 
@@ -87,10 +87,13 @@ export default function CreateRoom({ setCreateRoom }: any) {
 
               <div className="flex gap-2">
                 <Button
-                  onClick={() => router.push(`/canvas/room/${roomLink.split('/').pop()}`)}
+                  onClick={() => {
+                    const roomId = roomLink.split('/').pop() || '';
+                    joinRoom(roomId);
+                  }}
                   className=""
                 >
-                  Join Room
+                  {loading ? "Joining..." : "Join Room"}
                 </Button>
               </div>
             </div> : <div className="flex flex-col gap-4">
@@ -98,7 +101,7 @@ export default function CreateRoom({ setCreateRoom }: any) {
                 Click the button below to generate a new room link that you can share with others.
               </p>
               <Button onClick={generateRoomLink} className="w-full">
-                {loading ? 'Generating Room...' : 'Generate Room Link'}
+                {loader ? 'Generating Room...' : 'Generate Room Link'}
               </Button>
             </div>}
           </div>

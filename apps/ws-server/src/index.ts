@@ -10,6 +10,7 @@ wss.on('connection', async function connection(ws, request) {
   if (!url) {
     return;
   }
+  console.log(url);
 
   const queryParams = new URLSearchParams(url.split('?')[1]);
   const token = queryParams.get('token') || '';
@@ -28,6 +29,7 @@ wss.on('connection', async function connection(ws, request) {
   }
 
   addNewConnection(ws, userId, user?.name);
+  console.log(`New connection established for user: ${user.name} with ID: ${userId}`);
 
   ws.on('message', function message(data) {
     try {
@@ -39,16 +41,16 @@ wss.on('connection', async function connection(ws, request) {
 
         case MessageType.joinRoom:
           console.log('join message receiving')
-          joinRoom(userId, parsedData.roomId);
+          joinRoom(userId, parsedData.payload.roomId);
           break;
 
         case MessageType.leaveRoom:
-          leaveRoom(userId, parsedData.roomId);
+          leaveRoom(userId, parsedData.payload.roomId);
           break;
 
         case MessageType.chat:
           console.log('chat message receiving')
-          sendChatToRoom(userId, parsedData.shape, parsedData.roomId);
+          sendChatToRoom(userId, parsedData.shape, parsedData.payload.roomId);
           break;
 
         default:

@@ -38,14 +38,14 @@ const createRoom = async (req: CustomRequest, res: Response) => {
 
 const roomShapes = async (req: CustomRequest, res: Response) => {
     try {
-        const roomId = Number(req.params.roomId);
+        const roomId = req.params.roomId;
         if (!roomId) {
             emitError({ res, error: `No room`, statusCode: 400 });
             return;
         }
 
         const isRoom = await prismaClient.room.findFirst({
-            where: { id: roomId }
+            where: { linkId: roomId }
         });
 
         if (!isRoom) {

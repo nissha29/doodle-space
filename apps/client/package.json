@@ -28,6 +28,7 @@
     "react-infinite-canvas": "^3.4.1",
     "roughjs": "^4.6.6",
     "tailwind-merge": "^3.3.1",
+    "uuid": "^11.1.0",
     "zod": "^3.25.67",
     "zustand": "^5.0.6"
   },

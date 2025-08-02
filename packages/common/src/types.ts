@@ -21,6 +21,7 @@ export type Dimension = {
 }
 
 export type Shape = {
+    id: string,
     type: 'rectangle',
     dimension: Dimension[],
     x: number,
@@ -29,6 +30,7 @@ export type Shape = {
     height: number,
     seed?: number
 } | {
+    id: string,
     type: 'circle',
     dimension: Dimension[],
     x: number,
@@ -36,11 +38,13 @@ export type Shape = {
     diameter: number,
     seed?: number
 } | {
+    id: string,
     type: 'diamond',
     dimension: Dimension[],
     diamondPoints: [number, number][],
     seed?: number
 } | {
+    id: string,
     type: 'arrow',
     dimension: Dimension[],
     shaft: {
@@ -54,6 +58,7 @@ export type Shape = {
     right: number[],
     seed?: number
 } | {
+    id: string,
     type: 'line',
     dimension: Dimension[],
     x1: number,
@@ -62,6 +67,7 @@ export type Shape = {
     y2: number,
     seed?: number
 } | {
+    id: string,
     type: 'text',
     x: number;
     y: number;
@@ -69,6 +75,7 @@ export type Shape = {
     font: string;
     color: string;
 } | {
+    id: string,
     type: 'pencil',
     points: Dimension[],
     options?: any

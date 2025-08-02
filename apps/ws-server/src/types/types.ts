@@ -10,5 +10,7 @@ export interface IUser {
 export enum MessageType {
     joinRoom = "joinRoom",
     leaveRoom = "leaveRoom",
-    chat = "chat"
+    create = "create",
+    update = "update",
+    delete = "delete",
 }

@@ -20,7 +20,7 @@ export const createRoom = async (roomData: { linkId: string }) => {
     }
 }
 
-export const getExistingShapes = async (roomId: number) => {
+export const getExistingShapes = async (roomId: string) => {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -32,7 +32,6 @@ export const getExistingShapes = async (roomId: number) => {
                 authorization: token,
             }
         });
-        console.log(response);
         const data = response.data.result.shapes;
 
         const shapes = data.map((currShape: { shape: string }) => {

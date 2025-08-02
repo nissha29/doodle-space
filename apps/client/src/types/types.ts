@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SetStateAction } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
 import { Dimension, Shape } from "@repo/common/types";
 
@@ -45,7 +45,10 @@ export type IndexStore = {
   index: number,
   setIndex: (updater: number | ((prev: number) => number)) => void;
 }
-
+export interface ShapeStore {
+  shapes: Shape[];
+  setShapes: (shapes: SetStateAction<Shape[]>) => void;
+}
 export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase' | 'pan'
 
 export type TextInput = { cords: Dimension, value: string };

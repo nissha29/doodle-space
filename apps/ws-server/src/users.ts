@@ -43,10 +43,15 @@ const joinRoom = async (userId: string, roomId: string) => {
     }
     user?.rooms.push(roomId);
     console.log('joined');
-    user.ws.send(JSON.stringify({
-        type: 'joinRoom',
-        message: `${user.username} has joined room`
-    }))
+
+    users.forEach(user => {
+        if (user.rooms.includes(roomId)) {
+            user.ws.send(JSON.stringify({
+                type: 'joinRoom',
+                message: `${user.username} has joined room`
+            }))
+        }
+    })
 }
 
 const leaveRoom = async (userId: string, roomId: string) => {
@@ -61,9 +66,17 @@ const leaveRoom = async (userId: string, roomId: string) => {
     }
 
     user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
+    users.forEach(user => {
+        if (user.rooms.includes(roomId)) {
+            user.ws.send(JSON.stringify({
+                type: 'leaveRoom',
+                message: `${user.username} has left room`
+            }))
+        }
+    })
 }
 
-const sendChatToRoom = async (userId: string, shape: Shape, roomId: string) => {
+const createShape = async (userId: string, shape: Shape, roomId: string) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`);
         return;
@@ -72,6 +85,7 @@ const sendChatToRoom = async (userId: string, shape: Shape, roomId: string) => {
     // use queues here, otherwise it will take long time to broadcast messages coz first it will put the message in DB then broadcast ---------------------------------
     await prismaClient.shape.create({
         data: {
+            id: shape.id,
             roomId,
             userId,
             shape,
@@ -81,10 +95,52 @@ const sendChatToRoom = async (userId: string, shape: Shape, roomId: string) => {
 
     users.forEach(user => {
         if (user.rooms.includes(roomId)) {
-            console.log(user);
             user.ws.send(JSON.stringify({
-                type: 'chat',
+                type: 'create',
                 shape,
+                roomId,
+            }))
+        }
+    })
+}
+
+const updateShape = async (userId: string, shape: Shape, roomId: string) => {
+    if (! await roomExists(roomId)) {
+        console.log(`Room doesn't exists`);
+        return;
+    }
+
+    await prismaClient.shape.update({
+        where: { id: shape.id },
+        data: { shape }
+    })
+
+    users.forEach(user => {
+        if (user.rooms.includes(roomId)) {
+            user.ws.send(JSON.stringify({
+                type: 'update',
+                shape,
+                roomId,
+            }))
+        }
+    })
+}                                                                                               
+
+const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
+    if (! await roomExists(roomId)) {
+        console.log(`Room doesn't exists`);
+        return;
+    }
+
+    await prismaClient.shape.delete({
+        where: { id: shapeId }
+    })
+
+    users.forEach(user => {
+        if (user.rooms.includes(roomId)) {
+            user.ws.send(JSON.stringify({
+                type: 'delete',
+                shapeId,
                 roomId,
             }))
         }
@@ -95,5 +151,7 @@ export {
     addNewConnection,
     joinRoom,
     leaveRoom,
-    sendChatToRoom
+    createShape,
+    updateShape,
+    deleteShape,
 }

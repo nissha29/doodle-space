@@ -20,7 +20,7 @@ import {
   getShapeIndexOnPrecisePoint,
 } from "@/utils/mouseListeners/mouseDown";
 import { Dimension, Shape } from "@repo/common/types";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { use, useEffect, useLayoutEffect, useRef, useState } from "react";
 import rough from "roughjs";
 import { InputText } from "./InputText";
 import useUndoRedo from "@/hooks/useUndoRedo";
@@ -29,6 +29,12 @@ import { useIndexStore } from "@/store/useIndexStore";
 import { Zoom } from "./Zoom";
 import { UndoRedo } from "./UndoRedo";
 import { useZoom } from "@/hooks/useZoom";
+import useSessionMode from "@/hooks/useSessionMode";
+import useSocket from "@/hooks/useSocket";
+import { v4 as uuidv4 } from 'uuid';
+import { useShapeStore } from "@/store/useShapeStore";
+import { getExistingShapes } from "@/api/room";
+import toast from "react-hot-toast";
 
 function getInitialShapes(): Shape[] {
   const rawCanvas = localStorage.getItem('current-canvas');
@@ -45,7 +51,7 @@ function getInitialShapes(): Shape[] {
       return allCanvases[idx] ?? [];
     }
   } catch {
-  
+
   }
 
   return [];
@@ -58,7 +64,6 @@ export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [action, setAction] = useState<Action>("none");
   const [start, setStart] = useState({ x: 0, y: 0 });
-  const [shapes, setShapes] = useState<Shape[]>(getInitialShapes);
   const [previewShape, setPreviewShape] = useState<Shape | null>(null);
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
@@ -79,6 +84,10 @@ export default function Canvas() {
   const { zoom, zoomIn, zoomOut, resetZoom } = useZoom();
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
+  const { mode, roomId } = useSessionMode();
+  const { createShape, updateShape, deleteShape } = useSocket();
+  const shapes = useShapeStore((s) => s.shapes);
+  const setShapes = useShapeStore((s) => s.setShapes);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -108,6 +117,24 @@ export default function Canvas() {
     window.addEventListener("resize", resizeCanvas);
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
+
+  useEffect(() => {
+
+    const restoredShapes = async () => {
+      if (mode === 'collaborative' && roomId) {
+        try {
+          const intialShapes = await getExistingShapes(roomId);
+          setShapes(intialShapes);
+        } catch (error) {
+          toast.error("Failed to load existing shapes.");
+        }
+      } else if (mode === 'solo') {
+        const initialShapes = getInitialShapes();
+        setShapes(initialShapes);
+      }
+    }
+    restoredShapes();
+  }, [mode, roomId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -302,9 +329,12 @@ export default function Canvas() {
       );
     } else if (action === "erase") {
       const hitIndex = getShapeIndexOnPrecisePoint(cords, shapes, ctx);
-      console.log(hitIndex);
       if (hitIndex !== -1) {
-        setShapes((prev) => prev.filter((_shape, index) => index !== hitIndex));
+        setShapes((prev: Shape[]) => prev.filter((_shape, index) => index !== hitIndex));
+        if (mode === "collaborative" && roomId) {
+          const shape = shapes[hitIndex];
+          deleteShape(roomId, shape);
+        }
       }
     }
   };
@@ -318,19 +348,33 @@ export default function Canvas() {
       activeTool === "pencil" &&
       currentPoints.length > 0
     ) {
-      const freeDraw: Shape = { type: "pencil", points: currentPoints };
+      const freeDraw: Shape = { id: uuidv4(), type: "pencil", points: currentPoints };
       addAction([...shapes, freeDraw]);
-      setShapes((prev) => [...prev, freeDraw]);
+      setShapes((prev: Shape[]) => [...prev, freeDraw]);
       setCurrentPoints([]);
+      if (mode === "collaborative" && roomId) {
+        createShape(roomId, freeDraw);
+      }
     } else if (action === "draw") {
       if (previewShape) {
         addAction([...shapes, previewShape]);
-        setShapes((prev) => [...prev, previewShape]);
+        setShapes((prev: Shape[]
+        ) => [...prev, previewShape]);
+        if (mode === "collaborative" && roomId) {
+          createShape(roomId, previewShape);
+        }
       }
     } else if (action === "move") {
+      if (mode === "collaborative" && roomId) {
+        const shape = shapes[selectedShapeIndex!];
+        updateShape(roomId, shape);
+      }
       addAction(shapes);
-      setSelectedShapeIndex(null);
     } else if (action === "resize") {
+      if (mode === "collaborative" && roomId) {
+        const shape = shapes[selectedShapeIndex!];
+        updateShape(roomId, shape);
+      }
       addAction(shapes);
     } else if (action === "erase") {
       addAction(shapes);

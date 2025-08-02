@@ -1,21 +1,24 @@
 "use client";
 
 import { WS_URL } from "@/config";
+import { useShapeStore } from "@/store/useShapeStore";
+import { Shape } from "@repo/common/types";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-let websocketInstance: WebSocket | null = null;
+let wsInstance: WebSocket | null = null;
 
-export default function useWebSocket() {
+export default function useSocket() {
   const [loading, setLoading] = useState(false);
-  const socket = useRef(websocketInstance);
+  const setShapes = useShapeStore((s) => s.setShapes);
+  const socket = useRef(wsInstance);
   const router = useRouter();
 
   function connect() {
-    if (websocketInstance && websocketInstance.readyState !== WebSocket.CLOSED) {
-      socket.current = websocketInstance;
-      return websocketInstance;
+    if (wsInstance && wsInstance.readyState !== WebSocket.CLOSED) {
+      socket.current = wsInstance;
+      return wsInstance;
     }
 
     const wsUrl = `${WS_URL}?token=${localStorage.getItem('token')}`;
@@ -27,7 +30,7 @@ export default function useWebSocket() {
 
     ws.onclose = () => {
       console.log('WebSocket connection closed');
-      websocketInstance = null;
+      wsInstance = null;
     };
 
     ws.onerror = () => {
@@ -38,25 +41,39 @@ export default function useWebSocket() {
       const data = JSON.parse(event.data);
       const type = data.type;
 
-      if (type === 'joinRoom') {
-        toast.success(`Room joined successfully`);
-      }
-      if (type === 'leaveRoom') {
-        toast.success(`Room left successfully`);
-      }
-      if (type === 'chat') {
+      switch (type) {
+        case 'joinRoom':
+          console.log(`User joined room: ${data.payload.roomId}`);
+          break;
+        case 'leaveRoom':
+          console.log(`User left room: ${data.payload.roomId}`);
+          break;
+        case 'create':
+          setShapes(prev => [...prev, data.shape]);
+          break;
+        case 'update':
+          setShapes(prev =>
+            prev.map(shape => (shape.id === data.shape.id ? data.shape : shape))
+          );
+          break;
+        case 'delete':
+          setShapes(prev => prev.filter(shape => shape.id !== data.shapeId));
+          break;
+        default:
+          console.error('Unknown message type received');
+          return;
       }
     };
 
     socket.current = ws;
-    websocketInstance = ws;
+    wsInstance = ws;
     return ws;
   }
 
   function sendMessage(type: string, payload: any) {
-    if (websocketInstance && websocketInstance.readyState === WebSocket.OPEN) {
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({ type, payload });
-      websocketInstance.send(message);
+      wsInstance.send(message);
       return true;
     }
     return false;
@@ -75,15 +92,63 @@ export default function useWebSocket() {
         sendMessage(type, payload);
       });
     }
-    router.push(`/canvas/room/${roomId}`) 
+    router.push(`/canvas/room/${roomId}`)
     setLoading(false);
   }
 
-  function leaveRoom() {
-    if (websocketInstance && websocketInstance.readyState === WebSocket.OPEN) {
-      sendMessage('leaveRoom', {});
-      websocketInstance.close();
-      websocketInstance = null;
+  function createShape(roomId: string, shape: Shape) {
+    const type = 'create';
+    const payload = { roomId, shape };
+
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+      if (wsInstance?.readyState === WebSocket.OPEN) {
+        sendMessage(type, payload);
+      } else {
+        wsInstance?.addEventListener('open', () => {
+          sendMessage(type, payload);
+        });
+      }
+    }
+  }
+
+  function updateShape(roomId: string, shape: Shape) {
+    const type = 'update';
+    const payload = { roomId, shape };
+
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+      if (wsInstance?.readyState === WebSocket.OPEN) {
+        sendMessage(type, payload);
+      } else {
+        wsInstance?.addEventListener('open', () => {
+          sendMessage(type, payload);
+        });
+      }
+    }
+  }
+
+  function deleteShape(roomId: string, shape: Shape) {
+    const type = 'delete';
+    const payload = { roomId, shapeId: shape.id };
+
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+      if (wsInstance?.readyState === WebSocket.OPEN) {
+        sendMessage(type, payload);
+      } else {
+        wsInstance?.addEventListener('open', () => {
+          sendMessage(type, payload);
+        });
+      }
+    }
+  }
+
+  function leaveRoom(roomId: string) {
+    const type = 'leaveRoom';
+    const payload = { roomId };
+
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+      sendMessage(type, payload);
+      wsInstance.close();
+      wsInstance = null;
     }
   }
 
@@ -92,6 +157,9 @@ export default function useWebSocket() {
     loading,
     sendMessage,
     joinRoom,
+    createShape,
+    updateShape,
+    deleteShape,
     leaveRoom,
   };
 }

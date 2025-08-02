@@ -2,6 +2,7 @@ import useUndoRedo from "@/hooks/useUndoRedo";
 import { TextInput } from "@/types/types";
 import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 export function InputText({
   textInput,
@@ -42,6 +43,7 @@ export function InputText({
               : textInput.cords.y;
 
             const text: Shape = {
+              id: uuidv4(),
               type: "text",
               x: textInput.cords.x,
               y: textInput.cords.y,

@@ -2,13 +2,14 @@ import { ToolType } from "@/types/types";
 import { Dimension, Shape } from "@repo/common/types";
 import { Dispatch, SetStateAction } from "react";
 import { getBoundingBox } from "../boundingBox";
+import { v4 as uuidv4 } from 'uuid';
 
 export const makeShape = (active: ToolType, start: Dimension, end: Dimension) => {
   let shape: Shape;
 
   switch (active) {
     case "rectangle": {
-      shape = { type: "rectangle", dimension: [start, end], x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
+      shape = { id: uuidv4(), type: "rectangle", dimension: [start, end], x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
       break;
     }
 
@@ -16,7 +17,7 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
       const diameter = Math.sqrt(
         Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
       );
-      shape = { type: "circle", dimension: [start, end], x: start.x, y: start.y, diameter, seed: 2 };
+      shape = { id: uuidv4(), type: "circle", dimension: [start, end], x: start.x, y: start.y, diameter, seed: 2 };
       break;
     }
 
@@ -30,7 +31,7 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
         [cx, cy + size],
         [cx - size, cy],
       ];
-      shape = { type: 'diamond', dimension: [start, end], diamondPoints: diamondPoints, seed: 3 }
+      shape = { id: uuidv4(), type: 'diamond', dimension: [start, end], diamondPoints: diamondPoints, seed: 3 }
       break;
     }
 
@@ -48,12 +49,12 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
         end.x - headLength * Math.cos(angle + Math.PI / 6),
         end.y - headLength * Math.sin(angle + Math.PI / 6)
       ];
-      shape = { type: 'arrow', dimension: [start, end], shaft, tip, left, right, seed: 4 }
+      shape = { id: uuidv4(), type: 'arrow', dimension: [start, end], shaft, tip, left, right, seed: 4 }
       break;
     }
 
     case "line": {
-      shape = { type: "line", dimension: [start, end], x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
+      shape = { id: uuidv4(), type: "line", dimension: [start, end], x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
       break;
     }
 

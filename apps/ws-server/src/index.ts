@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 import { authUser } from './auth/auth.js';
-import { addNewConnection, joinRoom, leaveRoom, sendChatToRoom } from './users.js';
+import { addNewConnection, joinRoom, leaveRoom, createShape, updateShape, deleteShape } from './users.js';
 import { MessageType } from './types/types.js';
 const wss = new WebSocketServer({ port: 8080 });
 import { prismaClient } from '@repo/prisma/client';
@@ -48,9 +48,19 @@ wss.on('connection', async function connection(ws, request) {
           leaveRoom(userId, parsedData.payload.roomId);
           break;
 
-        case MessageType.chat:
+        case MessageType.create:
           console.log('chat message receiving')
-          sendChatToRoom(userId, parsedData.shape, parsedData.payload.roomId);
+          createShape(userId, parsedData.payload.shape, parsedData.payload.roomId);
+          break;
+        
+        case MessageType.update:
+          console.log('update message receiving');
+          updateShape(userId, parsedData.payload.shape, parsedData.payload.roomId);
+          break;
+
+        case MessageType.delete:
+          console.log('delete message receiving');
+          deleteShape(userId, parsedData.payload.shape.id, parsedData.payload.roomId);
           break;
 
         default:

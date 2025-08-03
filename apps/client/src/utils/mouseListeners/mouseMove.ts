@@ -4,12 +4,14 @@ import { Dispatch, SetStateAction } from "react";
 import { getBoundingBox } from "../boundingBox";
 import { v4 as uuidv4 } from 'uuid';
 
-export const makeShape = (active: ToolType, start: Dimension, end: Dimension) => {
+export const makeShape = (active: ToolType, start: Dimension, end: Dimension, existingId?: string) => {
   let shape: Shape;
+
+  let id = existingId || uuidv4();
 
   switch (active) {
     case "rectangle": {
-      shape = { id: uuidv4(), type: "rectangle", dimension: [start, end], x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
+      shape = { id, type: "rectangle", dimension: [start, end], x: start.x, y: start.y, width: end.x - start.x, height: end.y - start.y, seed: 1 };
       break;
     }
 
@@ -17,7 +19,7 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
       const diameter = Math.sqrt(
         Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
       );
-      shape = { id: uuidv4(), type: "circle", dimension: [start, end], x: start.x, y: start.y, diameter, seed: 2 };
+      shape = { id, type: "circle", dimension: [start, end], x: start.x, y: start.y, diameter, seed: 2 };
       break;
     }
 
@@ -31,7 +33,7 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
         [cx, cy + size],
         [cx - size, cy],
       ];
-      shape = { id: uuidv4(), type: 'diamond', dimension: [start, end], diamondPoints: diamondPoints, seed: 3 }
+      shape = { id, type: 'diamond', dimension: [start, end], diamondPoints: diamondPoints, seed: 3 }
       break;
     }
 
@@ -49,12 +51,12 @@ export const makeShape = (active: ToolType, start: Dimension, end: Dimension) =>
         end.x - headLength * Math.cos(angle + Math.PI / 6),
         end.y - headLength * Math.sin(angle + Math.PI / 6)
       ];
-      shape = { id: uuidv4(), type: 'arrow', dimension: [start, end], shaft, tip, left, right, seed: 4 }
+      shape = { id, type: 'arrow', dimension: [start, end], shaft, tip, left, right, seed: 4 }
       break;
     }
 
     case "line": {
-      shape = { id: uuidv4(), type: "line", dimension: [start, end], x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
+      shape = { id, type: "line", dimension: [start, end], x1: start.x, x2: end.x, y1: start.y, y2: end.y, seed: 5 };
       break;
     }
 
@@ -115,7 +117,7 @@ export function handleMouseMovementOnMove(mouse: Dimension, setShapes: Dispatch<
           x: start.x + rel.x,
           y: start.y + rel.y,
         };
-        return makeShape(shape.type, start, end)!;
+        return makeShape(shape.type, start, end, shape.id)!;
       }
       return shape;
     })
@@ -237,7 +239,7 @@ export function handleMouseMovementOnResize(
           newStart = start;
           newEnd = mouse;
       }
-      return makeShape(shape.type, newStart, newEnd)!;
+      return makeShape(shape.type, newStart, newEnd, shape.id)!;
     })
   );
 }

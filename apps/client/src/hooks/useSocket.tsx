@@ -3,7 +3,7 @@
 import { WS_URL } from "@/config";
 import { useShapeStore } from "@/store/useShapeStore";
 import { Shape } from "@repo/common/types";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -14,6 +14,7 @@ export default function useSocket() {
   const setShapes = useShapeStore((s) => s.setShapes);
   const socket = useRef(wsInstance);
   const router = useRouter();
+  const pathname = usePathname();
 
   function connect() {
     if (wsInstance && wsInstance.readyState !== WebSocket.CLOSED) {
@@ -92,7 +93,9 @@ export default function useSocket() {
         sendMessage(type, payload);
       });
     }
-    router.push(`/canvas/room/${roomId}`)
+    if (pathname !== `/canvas/room/${roomId}`) {
+      router.push(`/canvas/room/${roomId}`);
+    }
     setLoading(false);
   }
 

@@ -110,21 +110,29 @@ const updateShape = async (userId: string, shape: Shape, roomId: string) => {
         return;
     }
 
-    await prismaClient.shape.update({
-        where: { id: shape.id },
-        data: { shape }
-    })
+    try {
+        await prismaClient.shape.update({
+            where: { id: shape.id },
+            data: { shape }
+        });
 
-    users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
-            user.ws.send(JSON.stringify({
-                type: 'update',
-                shape,
-                roomId,
-            }))
+        users.forEach(user => {
+            if (user.rooms.includes(roomId)) {
+                user.ws.send(JSON.stringify({
+                    type: 'update',
+                    shape,
+                    roomId,
+                }))
+            }
+        })
+    } catch (error: any) {
+        if (error.code === 'P2025') {
+            console.log(`Shape with id ${shape.id} not found`);
+        } else {
+            throw error;
         }
-    })
-}                                                                                               
+    }
+}
 
 const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
     if (! await roomExists(roomId)) {
@@ -132,19 +140,27 @@ const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
         return;
     }
 
-    await prismaClient.shape.delete({
-        where: { id: shapeId }
-    })
+    try {
+        await prismaClient.shape.delete({
+            where: { id: shapeId }
+        })
 
-    users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
-            user.ws.send(JSON.stringify({
-                type: 'delete',
-                shapeId,
-                roomId,
-            }))
+        users.forEach(user => {
+            if (user.rooms.includes(roomId)) {
+                user.ws.send(JSON.stringify({
+                    type: 'delete',
+                    shapeId,
+                    roomId,
+                }))
+            }
+        })
+    } catch (error: any) {
+        if (error.code === 'P2025') {
+            console.log(`Shape with id ${shapeId} not found`);
+        } else {
+            throw error;
         }
-    })
+    }
 }
 
 export {

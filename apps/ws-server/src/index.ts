@@ -39,11 +39,6 @@ wss.on('connection', async function connection(ws, request) {
 
       switch (parsedData.type) {
 
-        case MessageType.joinRoom:
-          console.log('join message receiving')
-          joinRoom(userId, parsedData.payload.roomId);
-          break;
-
         case MessageType.leaveRoom:
           leaveRoom(userId, parsedData.payload.roomId);
           break;
@@ -60,7 +55,12 @@ wss.on('connection', async function connection(ws, request) {
 
         case MessageType.delete:
           console.log('delete message receiving');
-          deleteShape(userId, parsedData.payload.shape.id, parsedData.payload.roomId);
+          deleteShape(userId, parsedData.payload.shapeId, parsedData.payload.roomId);
+          break;
+
+        case MessageType.joinRoom:
+          console.log('join message receiving')
+          joinRoom(userId, parsedData.payload.roomId);
           break;
 
         default:

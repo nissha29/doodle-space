@@ -1,3 +1,5 @@
+import useSessionMode from "@/hooks/useSessionMode";
+import useSocket from "@/hooks/useSocket";
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { TextInput } from "@/types/types";
 import { Dimension, Shape } from "@repo/common/types";
@@ -18,6 +20,8 @@ export function InputText({
   panOffset: Dimension
 }) {
   const { addAction } = useUndoRedo();
+  const { mode, roomId } = useSessionMode();
+  const { createShape } = useSocket();
 
   return (
     textInput && (
@@ -51,7 +55,9 @@ export function InputText({
               font: "24px 'Indie Flower'",
               color: ''
             };
-            
+            if (mode === "collaborative" && roomId) {
+              createShape(roomId, text);
+            }
             addAction([...shapes, text])
             setShapes((prev: any) => [...prev, text]);
           }

@@ -85,9 +85,17 @@ export default function Canvas() {
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
   const { mode, roomId } = useSessionMode();
-  const { createShape, updateShape, deleteShape } = useSocket();
+  const { createShape, updateShape, deleteShape, joinRoom } = useSocket();
   const shapes = useShapeStore((s) => s.shapes);
   const setShapes = useShapeStore((s) => s.setShapes);
+  const [hasMoved, setHasMoved] = useState(false);
+
+  useEffect(() => {
+    if (mode === "collaborative" && roomId) {
+      console.log("Auto joining room:", roomId);
+      joinRoom(roomId);
+    }
+  }, [mode, roomId, joinRoom]);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -123,8 +131,8 @@ export default function Canvas() {
     const restoredShapes = async () => {
       if (mode === 'collaborative' && roomId) {
         try {
-          const intialShapes = await getExistingShapes(roomId);
-          setShapes(intialShapes);
+          const initialShapes = await getExistingShapes(roomId);
+          setShapes(initialShapes);
         } catch (error) {
           toast.error("Failed to load existing shapes.");
         }
@@ -251,6 +259,7 @@ export default function Canvas() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    setHasMoved(false);
 
     if (activeTool === "pan") {
       setPanStart({ x: event.clientX, y: event.clientY });
@@ -312,6 +321,7 @@ export default function Canvas() {
       if (!shape) return;
       setPreviewShape(shape);
     } else if (action === "move" && selectedShapeIndex !== null && dragOffset) {
+      setHasMoved(true);
       handleMouseMovementOnMove(
         cords,
         setShapes,
@@ -319,6 +329,7 @@ export default function Canvas() {
         dragOffset
       );
     } else if (action === "resize" && selectedShapeIndex != null) {
+      setHasMoved(true);
       handleMouseMovementOnResize(
         cords,
         shapes,
@@ -365,13 +376,13 @@ export default function Canvas() {
         }
       }
     } else if (action === "move") {
-      if (mode === "collaborative" && roomId) {
+      if (mode === "collaborative" && roomId && hasMoved) {
         const shape = shapes[selectedShapeIndex!];
         updateShape(roomId, shape);
       }
       addAction(shapes);
     } else if (action === "resize") {
-      if (mode === "collaborative" && roomId) {
+      if (mode === "collaborative" && roomId && hasMoved) {
         const shape = shapes[selectedShapeIndex!];
         updateShape(roomId, shape);
       }

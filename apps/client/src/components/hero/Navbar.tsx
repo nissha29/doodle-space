@@ -31,14 +31,14 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="lg:flex lg:gap-6 xl:gap-10 justify-center items-center text-xl hidden">
-        <Link href="/signup" className={`hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200 hover:cursor-pointer hover:scale-105`}>Try Now</Link>
-        <Link href="/signin" className="text-black bg-cyan-300 rounded-full px-8 py-2 hover:cursor-pointer hover:scale-105 transition-all ease-in-out duration-300">
-          Sign in
+        <Link href="/canvas" className={`hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200 hover:cursor-pointer hover:scale-105`}>Draw Solo</Link>
+        <Link href="/signup" className="text-black bg-cyan-300 rounded-full px-8 py-2 hover:cursor-pointer hover:scale-105 transition-all ease-in-out duration-300">
+          Sign up
         </Link>
       </div>
       <div className="lg:hidden flex">{isOpen ? <Plus className="hover:cursor-pointer rotate-45" onClick={() => setIsOpen(prev => !prev)} /> : <Menu
         className="hover:cursor-pointer" onClick={() => setIsOpen(prev => !prev)} />}</div>
-      {isOpen && <div className="bg-white px-1 py-2 text-black absolute top-14 w-full">
+      {isOpen && <div className="bg-white px-1 py-2 text-black absolute top-14 w-full z-10">
         <div className="flex flex-col space-y-4 px-4">
           <Link href="#" className="text-gray-800 font-medium hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200">
             Home
@@ -49,8 +49,8 @@ export default function Navbar() {
           <Link href="#features" className="text-gray-800 font-medium hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200">
             Features
           </Link>
-          <button className="bg-cyan-400 cursor-pointer text-black px-4 py-2 rounded-full font-light w-full " onClick={() => router.push('/signin')}>
-            Sign in
+          <button className="bg-cyan-400 cursor-pointer text-black px-4 py-2 rounded-full font-light w-full " onClick={() => router.push('/signup')}>
+            Sign up
           </button>
         </div>
       </div>}

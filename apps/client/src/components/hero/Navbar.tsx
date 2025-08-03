@@ -18,7 +18,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="lg:flex lg:gap-10 xl:gap-16 justify-center items-center text-xl z-10 hidden">
+      <div className="pl-10 lg:flex lg:gap-10 xl:gap-16 justify-center items-center text-xl z-10 hidden">
         <Link href="/" className={navBarLinkStyles}>
           Home
         </Link>

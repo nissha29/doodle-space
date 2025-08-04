@@ -20,7 +20,7 @@ export function SelectTool() {
     setActiveTool(tool);
   }
   return (
-    <div className="bg-neutral-800/60 backdrop-blur-md px-4 py-4 rounded-2xl">
+    <div className="bg-neutral-800/60 backdrop-blur-md px-3.5 py-4 rounded-lg">
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
           <Tool

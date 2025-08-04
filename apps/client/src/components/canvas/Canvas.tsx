@@ -35,6 +35,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useShapeStore } from "@/store/useShapeStore";
 import { getExistingShapes } from "@/api/room";
 import toast from "react-hot-toast";
+import { CollaborationPanel } from "./CollaborationPanel";
+import { Users } from "lucide-react";
 
 function getInitialShapes(): Shape[] {
   const rawCanvas = localStorage.getItem('current-canvas');
@@ -89,13 +91,14 @@ export default function Canvas() {
   const shapes = useShapeStore((s) => s.shapes);
   const setShapes = useShapeStore((s) => s.setShapes);
   const [hasMoved, setHasMoved] = useState(false);
+  const [showCollabPanel, setShowCollabPanel] = useState(false);
 
   useEffect(() => {
     if (mode === "collaborative" && roomId) {
       console.log("Auto joining room:", roomId);
       joinRoom(roomId);
     }
-  }, [mode, roomId, joinRoom]);
+  }, [mode, roomId]);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -416,8 +419,17 @@ export default function Canvas() {
     }
   };
 
+  const toggleCollaborationPanel = () => {
+    setShowCollabPanel(!showCollabPanel);
+  };
+
+  const closeCollaborationPanel = () => {
+    setShowCollabPanel(false);
+  };
+
+
   return (
-    <div className="relative overflow-y-hidden">
+    <div className="relative overflow-y-hidden w-full h-full">
       <canvas
         ref={canvasRef}
         width={1920}
@@ -448,8 +460,21 @@ export default function Canvas() {
       </div>
       <div>
         {/* <Zoom zoom={zoom} zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom}/> */}
-        <UndoRedo />
+        {mode === 'solo' && <UndoRedo />}
+        {mode === 'collaborative' && <div><button
+          onClick={toggleCollaborationPanel}
+          className="fixed bottom-5 left-4 sm:bottom-6 sm:left-10 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
+        >
+          <Users className="w-5 h-5" />
+          <span className="hidden md:inline">View Participants</span>
+        </button>
+
+          <CollaborationPanel
+            isVisible={showCollabPanel}
+            onClose={closeCollaborationPanel}
+          />
+        </div>}
       </div>
-    </div>
+    </div >
   );
 }

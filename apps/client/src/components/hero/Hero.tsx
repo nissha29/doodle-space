@@ -23,7 +23,6 @@ export default function Hero() {
       </div>
       <div
         className="w-full h-screen 2xl:px-40 xl:px-32 lg:px-14 md:px-8 sm:px-6 sm:py-6 py-4"
-        style={{ backgroundImage: "url('/bg.svg')" }}
       >
         <div className="relative">
           <div className="hidden sm:flex absolute text-neutral-500 font-extralight -left-7"><LineSquiggle className="w-14 h-14 rotate-45" strokeWidth="1" /></div>

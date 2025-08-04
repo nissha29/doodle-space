@@ -64,7 +64,7 @@ export default function Grid() {
                   alt="couple"
                   fill
                   className="object-cover w-full sm:rounded-b-xl"
-                  sizes="100vw"
+                  sizes="240px"
                 />
                 <Overlay show={activeIndex === imgIdx++} />
               </div>

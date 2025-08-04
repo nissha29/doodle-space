@@ -30,6 +30,14 @@ const roomExists = async (roomId: string) => {
     }
 }
 
+const usersCount = () => {
+
+}
+
+const participants = () => {
+    
+}
+
 const joinRoom = async (userId: string, roomId: string) => {
     if (! await roomExists(roomId)) {
         console.log(`Room doesn't exists`)
@@ -41,14 +49,24 @@ const joinRoom = async (userId: string, roomId: string) => {
         console.log(`No user connection found`);
         return;
     }
+
+    const alreadyInRoom = user.rooms.find(room => room === roomId);
+    if(alreadyInRoom){
+        console.log(`Already joined`);
+        return;
+    }
+
     user?.rooms.push(roomId);
     console.log('joined');
 
-    users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
-            user.ws.send(JSON.stringify({
+    users.forEach(recipient => {
+        if (recipient.rooms.includes(roomId)) {
+            console.log(`name - ${recipient.username}, rooms - ${recipient.rooms}`);
+            recipient.ws.send(JSON.stringify({
                 type: 'joinRoom',
-                message: `${user.username} has joined room`
+                username: user,
+                roomId,
+                message: `${user.username} has joined room`,
             }))
         }
     })
@@ -66,10 +84,12 @@ const leaveRoom = async (userId: string, roomId: string) => {
     }
 
     user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
-    users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
+    users.forEach(recipient => {
+        if (recipient.rooms.includes(roomId)) {
+            console.log(`name - ${recipient.username}, rooms - ${recipient.rooms}`);
             user.ws.send(JSON.stringify({
                 type: 'leaveRoom',
+                username: user,
                 message: `${user.username} has left room`
             }))
         }
@@ -95,6 +115,7 @@ const createShape = async (userId: string, shape: Shape, roomId: string) => {
 
     users.forEach(user => {
         if (user.rooms.includes(roomId)) {
+            console.log(`name - ${user.username}, rooms - ${user.rooms}`);
             user.ws.send(JSON.stringify({
                 type: 'create',
                 shape,
@@ -118,6 +139,7 @@ const updateShape = async (userId: string, shape: Shape, roomId: string) => {
 
         users.forEach(user => {
             if (user.rooms.includes(roomId)) {
+                console.log(`name - ${user.username}, rooms - ${user.rooms}`);
                 user.ws.send(JSON.stringify({
                     type: 'update',
                     shape,
@@ -147,6 +169,7 @@ const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
 
         users.forEach(user => {
             if (user.rooms.includes(roomId)) {
+                console.log(`name - ${user.username}, rooms - ${user.rooms}`);
                 user.ws.send(JSON.stringify({
                     type: 'delete',
                     shapeId,

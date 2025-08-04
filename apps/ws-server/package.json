@@ -9,8 +9,8 @@
     "dev": "pnpm run build && pnpm run start"
   },
   "dependencies": {
-    "@repo/prisma": "workspace:*",
     "@repo/common": "workspace:*",
+    "@repo/prisma": "workspace:*",
     "dotenv": "^17.0.0",
     "jsonwebtoken": "^9.0.2",
     "typescript": "^5.8.3",

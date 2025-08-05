@@ -1,4 +1,3 @@
-// src/components/canvas/CollaborationPanel.tsx
 "use client";
 import { APP_URL } from '@/config';
 import useSocket from '@/hooks/useSocket';
@@ -6,46 +5,19 @@ import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 import { Check, Copy, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-// The User interface is now simpler
-interface User {
-  id: string;
-  name: string;
-}
+import { useParticipantStore } from '@/store/usePaticipantStore';
 
 interface CollaborationPanelProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-const users = [
-  {
-    id: 'user-1-abc',
-    name: 'Alex Johnson',
-  },
-  {
-    id: 'user-2-def',
-    name: 'Maria Garcia',
-  },
-  {
-    id: 'user-3-ghi',
-    name: 'Chen Wei',
-  },
-  {
-    id: 'user-4-jkl',
-    name: 'Fatima Al-Fassi',
-  },
-  {
-    id: 'user-5-mno',
-    name: 'David Smith',
-  },
-];
-
 export function CollaborationPanel({ isVisible, onClose }: CollaborationPanelProps) {
   const [isCopied, setIsCopied] = useState(false);
   const { leaveRoom } = useSocket();
   const pathname = usePathname();
   const roomLink = `${APP_URL}${pathname}`;
+  const { participants } = useParticipantStore();
 
   function getRoomIdFromLink() {
     try {
@@ -82,11 +54,11 @@ export function CollaborationPanel({ isVisible, onClose }: CollaborationPanelPro
       </button>
 
       <div className="mb-4">
-        <h3 className="font-bold text-lg mb-2">Participants ({users.length})</h3>
+        <h3 className="font-bold text-lg mb-2">Participants ({participants.length})</h3>
         <div className="flex flex-col gap-1 max-h-32 overflow-y-auto pr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {users.map((user) => (
-            <div key={user.id} className="text-gray-300 py-1 px-2 rounded-md hover:bg-neutral-700 transition-colors">
-              {user.name}
+          {participants.map((user) => (
+            <div key={user.id} className="text-neutral-200 py-1 px-2 rounded-md hover:bg-neutral-700 transition-colors">
+              {user.name.toUpperCase()}
             </div>
           ))}
         </div>

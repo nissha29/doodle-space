@@ -3,13 +3,24 @@ import WebSocket from "ws";
 import { prismaClient } from '@repo/prisma/client'
 import { Shape } from "@repo/common/types";
 
-// have to optimise the TC from O(n) to O(1) for user array traversing, create maps --------------------------------------
-// also add other checks here for validations
-const users: IUser[] = [];
+const users = new Map<string, IUser>();
 
-const addNewConnection = (ws: WebSocket, userId: string, username: string) => {
-    users.push({ ws, userId, username, rooms: [] })
+const getUser = (userId: string) => {
+    return users.get(userId);
 }
+
+const addConnection = (ws: WebSocket, userId: string, username: string) => {
+    users.set(userId, { ws, userId, username, rooms: new Set() });
+    console.log(`User connected: ${username} (Total online: ${users.size})`);
+};
+
+const removeConnection = (userId: string) => {
+    const user = getUser(userId);
+    if (user) {
+        console.log(`User disconnected: ${user.username}`);
+        users.delete(userId);
+    }
+};
 
 const roomExists = async (roomId: string) => {
     try {
@@ -30,106 +41,120 @@ const roomExists = async (roomId: string) => {
     }
 }
 
-const usersCount = () => {
+const getParticipants = (roomId: string) => {
+    const participants = [];
+    for (const user of users.values()) {
+        if (user.rooms.has(roomId)) {
+            participants.push({ id: user.userId, name: user.username });
+        }
+    }
+    return participants;
+};
 
-}
-
-const participants = () => {
-    
-}
+const broadcastToRoom = (roomId: string, message: object) => {
+    const serializedMessage = JSON.stringify(message);
+    for (const user of users.values()) {
+        if (user.rooms.has(roomId)) {
+            user.ws.send(serializedMessage);
+        }
+    }
+};
 
 const joinRoom = async (userId: string, roomId: string) => {
-    if (! await roomExists(roomId)) {
-        console.log(`Room doesn't exists`)
+    if (!await roomExists(roomId)) {
+        console.log(`Room ${roomId} doesn't exist`);
         return;
     }
 
-    const user = users.find(user => user.userId == userId);
+    const user = getUser(userId);
     if (!user) {
-        console.log(`No user connection found`);
+        console.log(`No user connection found for ID: ${userId}`);
         return;
     }
 
-    const alreadyInRoom = user.rooms.find(room => room === roomId);
-    if(alreadyInRoom){
-        console.log(`Already joined`);
+    if (user.rooms.has(roomId)) {
+        console.log(`${user.username} is already in room ${roomId}`);
         return;
     }
 
-    user?.rooms.push(roomId);
-    console.log('joined');
+    user.rooms.add(roomId);
+    console.log(`${user.username} joined room ${roomId}`);
 
-    users.forEach(recipient => {
-        if (recipient.rooms.includes(roomId)) {
-            console.log(`name - ${recipient.username}, rooms - ${recipient.rooms}`);
-            recipient.ws.send(JSON.stringify({
-                type: 'joinRoom',
-                username: user,
-                roomId,
-                message: `${user.username} has joined room`,
-            }))
+    const join = {
+        type: 'joinRoom',
+        payload: {
+            username: user.username,
+            roomId,
         }
-    })
-}
+    };
+
+    const usersList = getParticipants(roomId);
+    const list = {
+        type: 'usersList',
+        payload: {
+            participants: usersList,
+            roomId,
+        }
+    };
+
+    broadcastToRoom(roomId, join);
+    broadcastToRoom(roomId, list);
+};
 
 const leaveRoom = async (userId: string, roomId: string) => {
-    if (! await roomExists(roomId)) {
-        console.log(`Room doesn't exists`);
-    }
-
-    const user = users.find(user => user.userId == userId);
-    if (!user) {
-        console.log(`No user connection found`);
+    const user = getUser(userId);
+    if (!user || !user.rooms.has(roomId)) {
         return;
     }
 
-    user.rooms = user?.rooms.filter(currRoomId => currRoomId === roomId);
-    users.forEach(recipient => {
-        if (recipient.rooms.includes(roomId)) {
-            console.log(`name - ${recipient.username}, rooms - ${recipient.rooms}`);
-            user.ws.send(JSON.stringify({
-                type: 'leaveRoom',
-                username: user,
-                message: `${user.username} has left room`
-            }))
+    user.rooms.delete(roomId);
+    console.log(`${user.username} left room ${roomId}`);
+
+    const leave = {
+        type: 'leaveRoom',
+        payload: {
+            username: user.username,
+            roomId,
         }
-    })
-}
+    };
+
+    const usersList = getParticipants(roomId);
+    const list = {
+        type: 'usersList',
+        payload: {
+            participants: usersList,
+            roomId,
+        }
+    };
+
+    broadcastToRoom(roomId, leave);
+    broadcastToRoom(roomId, list);
+};
 
 const createShape = async (userId: string, shape: Shape, roomId: string) => {
-    if (! await roomExists(roomId)) {
-        console.log(`Room doesn't exists`);
-        return;
-    }
+    if (!await roomExists(roomId)) return;
 
-    // use queues here, otherwise it will take long time to broadcast messages coz first it will put the message in DB then broadcast ---------------------------------
-    await prismaClient.shape.create({
-        data: {
-            id: shape.id,
-            roomId,
-            userId,
-            shape,
-        }
-    })
-    // -------------------------------
-
-    users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
-            console.log(`name - ${user.username}, rooms - ${user.rooms}`);
-            user.ws.send(JSON.stringify({
-                type: 'create',
-                shape,
+    try {
+        await prismaClient.shape.create({
+            data: {
+                id: shape.id,
                 roomId,
-            }))
-        }
-    })
-}
+                userId,
+                shape,
+            }
+        });
+
+        broadcastToRoom(roomId, {
+            type: 'create',
+            payload: { shape, roomId }
+        });
+    } catch (error) {
+        console.error(`Error while creating shape`);
+    }
+};
 
 const updateShape = async (userId: string, shape: Shape, roomId: string) => {
-    if (! await roomExists(roomId)) {
-        console.log(`Room doesn't exists`);
-        return;
-    }
+    if (!await roomExists(roomId)) return;
 
     try {
         await prismaClient.shape.update({
@@ -137,57 +162,44 @@ const updateShape = async (userId: string, shape: Shape, roomId: string) => {
             data: { shape }
         });
 
-        users.forEach(user => {
-            if (user.rooms.includes(roomId)) {
-                console.log(`name - ${user.username}, rooms - ${user.rooms}`);
-                user.ws.send(JSON.stringify({
-                    type: 'update',
-                    shape,
-                    roomId,
-                }))
-            }
-        })
+        broadcastToRoom(roomId, {
+            type: 'update',
+            payload: { shape, roomId }
+        });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.log(`Shape with id ${shape.id} not found`);
+            console.warn(`Attempted to update a shape with ID [${shape.id}] that does not exist. Skipping.`);
         } else {
-            throw error;
+            console.error(`An unexpected error occurred while updating shape [${shape.id}]:`, error);
         }
     }
-}
+};
 
 const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
-    if (! await roomExists(roomId)) {
-        console.log(`Room doesn't exists`);
-        return;
-    }
+    if (!await roomExists(roomId)) return;
 
     try {
         await prismaClient.shape.delete({
             where: { id: shapeId }
-        })
+        });
 
-        users.forEach(user => {
-            if (user.rooms.includes(roomId)) {
-                console.log(`name - ${user.username}, rooms - ${user.rooms}`);
-                user.ws.send(JSON.stringify({
-                    type: 'delete',
-                    shapeId,
-                    roomId,
-                }))
-            }
-        })
+        broadcastToRoom(roomId, {
+            type: 'delete',
+            payload: { shapeId, roomId }
+        });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.log(`Shape with id ${shapeId} not found`);
+            console.warn(`Attempted to delete a shape with ID [${shapeId}] that does not exist. Skipping.`);
         } else {
-            throw error;
+            console.error(`An unexpected error occurred while updating shape [${shapeId}]:`, error);
         }
     }
-}
+};
 
 export {
-    addNewConnection,
+    getUser,
+    addConnection,
+    removeConnection,
     joinRoom,
     leaveRoom,
     createShape,

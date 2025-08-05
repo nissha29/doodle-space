@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 import { authUser } from './auth/auth.js';
-import { addNewConnection, joinRoom, leaveRoom, createShape, updateShape, deleteShape } from './users.js';
+import { joinRoom, leaveRoom, createShape, updateShape, deleteShape, addConnection, removeConnection, getUser } from './users.js';
 import { MessageType } from './types/types.js';
 const wss = new WebSocketServer({ port: 8080 });
 import { prismaClient } from '@repo/prisma/client';
@@ -28,8 +28,18 @@ wss.on('connection', async function connection(ws, request) {
     return;
   }
 
-  addNewConnection(ws, userId, user?.name);
+  addConnection(ws, userId, user?.name);
   console.log(`New connection established for user: ${user.name} with ID: ${userId}`);
+
+  ws.on('close', () => {
+    const user = getUser(userId); 
+    if (user) {
+      user.rooms.forEach((roomId: string) => {
+        leaveRoom(userId, roomId); 
+      });
+    }
+    removeConnection(userId);
+  })
 
   ws.on('message', function message(data) {
     try {
@@ -39,15 +49,20 @@ wss.on('connection', async function connection(ws, request) {
 
       switch (parsedData.type) {
 
+        case MessageType.joinRoom:
+          console.log('join message receiving')
+          joinRoom(userId, parsedData.payload.roomId);
+          break;
+
         case MessageType.leaveRoom:
           leaveRoom(userId, parsedData.payload.roomId);
           break;
 
         case MessageType.create:
-          console.log('chat message receiving')
+          console.log('create message receiving')
           createShape(userId, parsedData.payload.shape, parsedData.payload.roomId);
           break;
-        
+
         case MessageType.update:
           console.log('update message receiving');
           updateShape(userId, parsedData.payload.shape, parsedData.payload.roomId);
@@ -56,11 +71,6 @@ wss.on('connection', async function connection(ws, request) {
         case MessageType.delete:
           console.log('delete message receiving');
           deleteShape(userId, parsedData.payload.shapeId, parsedData.payload.roomId);
-          break;
-
-        case MessageType.joinRoom:
-          console.log('join message receiving')
-          joinRoom(userId, parsedData.payload.roomId);
           break;
 
         default:

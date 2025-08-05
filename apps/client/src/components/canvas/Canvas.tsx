@@ -2,7 +2,7 @@
 
 import { SelectTool } from "@/components/canvas/selectTool";
 import { useActiveStore } from "@/store/useActiveStore";
-import { Action, TextInput } from "@/types/types";
+import { Action, SocketStatus, TextInput } from "@/types/types";
 import {
   getBoundingBox,
   drawBoundingBoxAndHandlers,
@@ -36,7 +36,7 @@ import { useShapeStore } from "@/store/useShapeStore";
 import { getExistingShapes } from "@/api/room";
 import toast from "react-hot-toast";
 import { CollaborationPanel } from "./CollaborationPanel";
-import { Users } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 
 function getInitialShapes(): Shape[] {
   const rawCanvas = localStorage.getItem('current-canvas');
@@ -87,18 +87,17 @@ export default function Canvas() {
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
   const { mode, roomId } = useSessionMode();
-  const { createShape, updateShape, deleteShape, joinRoom } = useSocket();
+  const { createShape, updateShape, deleteShape, joinRoom, socketStatus } = useSocket();
   const shapes = useShapeStore((s) => s.shapes);
   const setShapes = useShapeStore((s) => s.setShapes);
   const [hasMoved, setHasMoved] = useState(false);
   const [showCollabPanel, setShowCollabPanel] = useState(false);
 
   useEffect(() => {
-    if (mode === "collaborative" && roomId) {
-      console.log("Auto joining room:", roomId);
+    if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
       joinRoom(roomId);
     }
-  }, [mode, roomId]);
+  }, [mode, roomId, socketStatus, joinRoom]);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -173,7 +172,9 @@ export default function Canvas() {
 
     ctx.save();
 
-    shapes.forEach((shape) => {
+    shapes.forEach((shape: Shape) => {
+      if (!shape) return;
+
       if (shape.type === "pencil") {
         freeDraw(ctx, shape.points, panOffset);
 
@@ -347,7 +348,7 @@ export default function Canvas() {
         setShapes((prev: Shape[]) => prev.filter((_shape, index) => index !== hitIndex));
         if (mode === "collaborative" && roomId) {
           const shape = shapes[hitIndex];
-          deleteShape(roomId, shape);
+          deleteShape(roomId, shape.id);
         }
       }
     }
@@ -426,6 +427,22 @@ export default function Canvas() {
   const closeCollaborationPanel = () => {
     setShowCollabPanel(false);
   };
+
+  if (mode === 'collaborative' && socketStatus !== SocketStatus.connected) {
+    return (
+      <div className="w-screen h-screen flex flex-col items-center justify-center bg-neutral-900 text-white gap-4">
+        <Loader2 className="w-12 h-12 animate-spin text-cyan-400" />
+        <p className="text-lg text-neutral-300">
+          {socketStatus === SocketStatus.connecting ? 'Connecting to the canvas...' : 'Connection lost.'}
+        </p>
+        {socketStatus === SocketStatus.disconnected && (
+          <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-cyan-600 rounded-md">
+            Retry Connection
+          </button>
+        )}
+      </div>
+    );
+  }
 
 
   return (

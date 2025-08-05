@@ -52,3 +52,19 @@ export interface ShapeStore {
 export type Action = 'none' | 'move' | 'draw' | 'resize' | 'erase' | 'pan'
 
 export type TextInput = { cords: Dimension, value: string };
+
+export type Participant = {
+  id: string,
+  name: string,
+}
+
+export interface ParticipantStore {
+  participants: Participant[],
+  setParticipants: (participants: Participant[]) => void; 
+}
+
+export enum SocketStatus {
+  'connecting',
+  'connected',
+  'disconnected',
+}

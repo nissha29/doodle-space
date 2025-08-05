@@ -1,146 +1,155 @@
 "use client";
 
 import { WS_URL } from "@/config";
+import { useParticipantStore } from "@/store/usePaticipantStore";
 import { useShapeStore } from "@/store/useShapeStore";
+import { useSocketStatusStore } from "@/store/useSocketStatusStore";
+import { SocketStatus } from "@/types/types";
 import { Shape } from "@repo/common/types";
 import { usePathname, useRouter } from "next/navigation";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
 let wsInstance: WebSocket | null = null;
-let messageQueue: string[] = []; // Queue for messages to be sent upon connection
+let connectionQueue: (() => void)[] = [];
+let isConnecting = false;
+
+const connect = (
+  token: string | null,
+  setSocketStatus: (status: SocketStatus) => void
+) => {
+  if (wsInstance || isConnecting) {
+    return;
+  }
+  isConnecting = true;
+  setSocketStatus(SocketStatus.connecting);
+
+  const wsUrl = `${WS_URL}?token=${token}`;
+  const ws = new WebSocket(wsUrl);
+  wsInstance = ws;
+
+  ws.onopen = () => {
+    console.log('WebSocket connection established');
+    isConnecting = false;
+    setSocketStatus(SocketStatus.connected);
+    connectionQueue.forEach(action => action());
+    connectionQueue = [];
+  };
+
+  ws.onclose = () => {
+    console.log('WebSocket connection closed');
+    isConnecting = false;
+    wsInstance = null;
+    setSocketStatus(SocketStatus.disconnected);
+  };
+
+  ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+    isConnecting = false;
+    wsInstance = null;
+    setSocketStatus(SocketStatus.disconnected);
+    toast.error('WebSocket connection error.');
+  };
+
+  return ws;
+};
 
 export default function useSocket() {
-  const [isConnected, setIsConnected] = useState(wsInstance?.readyState === WebSocket.OPEN);
-  const setShapes = useShapeStore((s) => s.setShapes);
+  const { setShapes } = useShapeStore();
   const router = useRouter();
+  const { setParticipants } = useParticipantStore();
+  const { socketStatus, setSocketStatus } = useSocketStatusStore();
   const pathname = usePathname();
-  const currentRoomRef = useRef<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  const connect = useCallback(() => {
-    if (wsInstance && wsInstance.readyState !== WebSocket.CLOSED) {
-      return wsInstance;
-    }
+  useEffect(() => {
+    const ws = connect(localStorage.getItem('token'), setSocketStatus);
 
-    // Clear queue on new connection attempt
-    messageQueue = [];
+    if (ws) {
 
-    const wsUrl = `${WS_URL}?token=${localStorage.getItem('token')}`;
-    const ws = new WebSocket(wsUrl);
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const { type, payload } = data;
 
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
-      setIsConnected(true);
-      // Process any messages that were queued while connecting
-      messageQueue.forEach((message) => ws.send(message));
-      messageQueue = []; // Clear the queue
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-      setIsConnected(false);
-      wsInstance = null;
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      toast.error('WebSocket connection error.');
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        const type = data.type;
-
-        switch (type) {
-          case 'joinRoom':
-            toast.success(data.message);
-            console.log(`User joined room: ${data.roomId}`);
-            break;
-          case 'create':
-            setShapes(prev => [...prev, data.shape]);
-            break;
-          case 'update':
-            setShapes(prev =>
-              prev.map(shape => (shape.id === data.shape.id ? data.shape : shape))
-            );
-            break;
-          case 'delete':
-            setShapes(prev => prev.filter(shape => shape.id !== data.shapeId));
-            break;
-          default:
-            console.error('Unknown message type received:', data);
+          switch (type) {
+            case 'joinRoom':
+              toast.success(`${payload.username} has joined room`);
+              break;
+            case 'leaveRoom':
+              toast.error(`${payload.username} has left the room`);
+              break;
+            case 'usersList':
+              setParticipants(payload.participants);
+              break;
+            case 'create':
+              setShapes(prev => [...prev, payload.shape]);
+              break;
+            case 'update':
+              setShapes(prev => prev.map(s => s.id === payload.shape.id ? payload.shape : s));
+              break;
+            case 'delete':
+              setShapes(prev => prev.filter(s => s.id !== payload.shapeId));
+              break;
+            default:
+              console.warn('Unknown message type:', type);
+          }
+        } catch (e) {
+          console.error("Failed to parse message:", e);
         }
-      } catch (e) {
-        console.error("Failed to parse message:", e);
+      };
+    }
+  }, [setParticipants, setShapes, setSocketStatus]);
+
+  const sendMessage = (type: string, payload: any) => {
+    const action = () => {
+      if (wsInstance?.readyState === WebSocket.OPEN) {
+        wsInstance.send(JSON.stringify({ type, payload }));
       }
     };
 
-    wsInstance = ws;
-    return ws;
-  }, [setShapes]);
-
-  // Connect on initial hook mount
-  useEffect(() => {
-    connect();
-  }, [connect]);
-
-
-  const sendMessage = (type: string, payload: any) => {
-    const message = JSON.stringify({ type, payload });
-    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
-      wsInstance.send(message);
+    if (wsInstance?.readyState === WebSocket.OPEN) {
+      action();
     } else {
-      // If the socket is not open, queue the message
-      console.log('Socket not open, queueing message:', message);
-      messageQueue.push(message);
-      // Ensure a connection is attempted if not already in progress
-      if (!wsInstance || wsInstance.readyState === WebSocket.CLOSED) {
-        connect();
+      connectionQueue.push(action);
+      if (!wsInstance && !isConnecting) {
+        connect(localStorage.getItem('token'), setSocketStatus);
       }
     }
   };
 
   const joinRoom = (roomId: string) => {
-    setLoading(true);
-    if (currentRoomRef.current === roomId) return;
-    currentRoomRef.current = roomId;
-
     sendMessage('joinRoom', { roomId });
+
     if (pathname !== `/canvas/room/${roomId}`) {
       router.push(`/canvas/room/${roomId}`);
     }
-    setLoading(false);
-  };
-  
-  const createShape = (roomId: string, shape: Shape) => {
-    sendMessage('create', { roomId, shape });
-  };
-  
-  const updateShape = (roomId: string, shape: Shape) => {
-    sendMessage('update', { roomId, shape });
-  };
-  
-  const deleteShape = (roomId: string, shape: Shape) => {
-    sendMessage('delete', { roomId, shapeId: shape.id });
   };
 
-  const leaveRoom = (roomId: string) => {
-      sendMessage('leaveRoom', { roomId });
-      if (wsInstance) {
-          wsInstance.close();
-      }
-      router.push('/draw-mode')
-  };
+
+  const leaveRoom = useCallback((roomId: string) => {
+    sendMessage('leaveRoom', { roomId });
+    wsInstance?.close();
+    router.push('/draw-mode');
+  }, [router]);
+
+  const createShape = useCallback((roomId: string, shape: Shape) => {
+    sendMessage('create', { roomId, shape });
+  }, []);
+
+  const updateShape = useCallback((roomId: string, shape: Shape) => {
+    sendMessage('update', { roomId, shape });
+  }, []);
+
+  const deleteShape = useCallback((roomId: string, shapeId: string) => {
+    sendMessage('delete', { roomId, shapeId });
+  }, []);
 
   return {
-    isConnected,
+    socketStatus,
     joinRoom,
+    leaveRoom,
     createShape,
     updateShape,
     deleteShape,
-    leaveRoom,
-    loading
   };
 }

@@ -39,7 +39,7 @@ export default function Hero() {
                     </div>
                     <div className="sm:text-lg">Your infinite canvas awaits</div>
                     <Link
-                      href="/signin"
+                      href="/canvas"
                       className="hover:bg-cyan-400 rounded-full p-1 transition-all duration-300 ease-in-out hover:scale-105"
                     >
                       <ArrowRight className="w-5 h-5" />

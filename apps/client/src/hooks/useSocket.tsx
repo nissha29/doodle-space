@@ -18,6 +18,7 @@ const connect = (
   token: string | null,
   setSocketStatus: (status: SocketStatus) => void
 ) => {
+  if(!token) return;
   if (wsInstance || isConnecting) {
     return;
   }

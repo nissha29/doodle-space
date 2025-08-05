@@ -42,7 +42,7 @@ export function CollaborationPanel({ isVisible, onClose }: CollaborationPanelPro
   if (!isVisible) return null;
 
   return (
-    <div className="absolute left-4 bottom-20 sm:left-10 bg-neutral-900/90 bg-opacity-80 backdrop-blur-md p-4 rounded-lg shadow-2xl border border-neutral-800 text-white w-52 sm:w-64 animate-in fade-in duration-200">
+    <div className="absolute right-4 bottom-20 sm:right-6 bg-neutral-900/90 bg-opacity-80 backdrop-blur-md p-4 rounded-lg shadow-2xl border border-neutral-800 text-white w-52 sm:w-64 animate-in fade-in duration-200">
 
       <button
         onClick={onClose}

@@ -49,6 +49,9 @@ export default function Navbar() {
           <Link href="#features" className="text-gray-800 font-medium hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200">
             Features
           </Link>
+          <Link href="/canvas" className="text-gray-800 font-medium hover:underline underline-offset-8 decoration-2 decoration-cyan-400 transition-all ease-in-out duration-200">
+            Draw Solo
+          </Link>
           <button className="bg-cyan-400 cursor-pointer text-black px-4 py-2 rounded-full font-light w-full " onClick={() => router.push('/signup')}>
             Sign up
           </button>

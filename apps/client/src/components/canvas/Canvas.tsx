@@ -20,15 +20,13 @@ import {
   getShapeIndexOnPrecisePoint,
 } from "@/utils/mouseListeners/mouseDown";
 import { Dimension, Shape } from "@repo/common/types";
-import React, { use, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import rough from "roughjs";
 import { InputText } from "./InputText";
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { useCurrentCanvasStore } from "@/store/useCurrentCanvasStore";
 import { useIndexStore } from "@/store/useIndexStore";
-import { Zoom } from "./Zoom";
 import { UndoRedo } from "./UndoRedo";
-import { useZoom } from "@/hooks/useZoom";
 import useSessionMode from "@/hooks/useSessionMode";
 import useSocket from "@/hooks/useSocket";
 import { v4 as uuidv4 } from 'uuid';
@@ -36,7 +34,9 @@ import { useShapeStore } from "@/store/useShapeStore";
 import { getExistingShapes } from "@/api/room";
 import toast from "react-hot-toast";
 import { CollaborationPanel } from "./CollaborationPanel";
-import { Loader2, Users } from "lucide-react";
+import { Loader2, LogOut, Users } from "lucide-react";
+import { useUserStore } from "@/store/useUserStore";
+import { useRouter } from "next/navigation";
 
 function getInitialShapes(): Shape[] {
   const rawCanvas = localStorage.getItem('current-canvas');
@@ -83,7 +83,6 @@ export default function Canvas() {
   const currentCanvas = useCurrentCanvasStore((s) => s.currentCanvas);
   const index = useIndexStore((s) => s.index);
   const { addAction, undo, redo } = useUndoRedo();
-  const { zoom, zoomIn, zoomOut, resetZoom } = useZoom();
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
   const { mode, roomId } = useSessionMode();
@@ -92,6 +91,7 @@ export default function Canvas() {
   const setShapes = useShapeStore((s) => s.setShapes);
   const [hasMoved, setHasMoved] = useState(false);
   const [showCollabPanel, setShowCollabPanel] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
@@ -466,21 +466,20 @@ export default function Canvas() {
         panOffset={panOffset}
       />
 
-      <div className="absolute top-6 left-10">
+      <div className="absolute top-6 left-6">
         <div className="text-2xl sm:text-3xl">
           ძထძℓꫀ
           <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραсꫀ</span>
         </div>
       </div>
-      <div className="fixed top-6 right-10 z-20">
+      <div className="fixed top-6 right-6 z-20">
         <SelectTool />
       </div>
       <div>
-        {/* <Zoom zoom={zoom} zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom}/> */}
         {mode === 'solo' && <UndoRedo />}
         {mode === 'collaborative' && <div><button
           onClick={toggleCollaborationPanel}
-          className="fixed bottom-5 left-4 sm:bottom-6 sm:left-10 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
+          className="fixed boottom-6 right-6 sm:bottom-6 sm:right-6 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
         >
           <Users className="w-5 h-5" />
           <span className="hidden md:inline">View Participants</span>
@@ -491,6 +490,19 @@ export default function Canvas() {
             onClose={closeCollaborationPanel}
           />
         </div>}
+        <div className="absolute bottom-6 left-6">
+          <button
+            onClick={() => {
+              localStorage.removeItem('token');
+              useUserStore.getState().setUser({ name: '', email: '' });
+              router.push('/signin')
+            }}
+            className="group flex items-center gap-2.5 rounded-lg bg-neutral-700/60 px-3 py-2 text-base text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:bg-rose-500 hover:text-white hover:cursor-pointer"
+          >
+            <span>Logout</span>
+            <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+          </button>
+        </div>
       </div>
     </div >
   );

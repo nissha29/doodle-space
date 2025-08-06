@@ -9,6 +9,7 @@ import { Shape } from "@repo/common/types";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+import useSessionMode from "./useSessionMode";
 
 let wsInstance: WebSocket | null = null;
 let connectionQueue: (() => void)[] = [];
@@ -61,6 +62,7 @@ export default function useSocket() {
   const { setParticipants } = useParticipantStore();
   const { socketStatus, setSocketStatus } = useSocketStatusStore();
   const pathname = usePathname();
+  const { mode, roomId } = useSessionMode();
 
   useEffect(() => {
     const ws = connect(localStorage.getItem('token'), setSocketStatus);
@@ -125,6 +127,12 @@ export default function useSocket() {
       router.push(`/canvas/room/${roomId}`);
     }
   };
+
+  useEffect(() => {
+      if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
+        joinRoom(roomId);
+      }
+    }, [mode, roomId, socketStatus, joinRoom]);
 
 
   const leaveRoom = useCallback((roomId: string) => {

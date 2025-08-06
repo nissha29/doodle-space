@@ -5,6 +5,34 @@ import { Shape } from "@repo/common/types";
 
 const users = new Map<string, IUser>();
 
+const shapeOperationQueue: any[] = [];
+let isProcessingQueue = false;
+
+const processShapeQueue = async () => {
+    if (isProcessingQueue || shapeOperationQueue.length === 0) {
+        return;
+    }
+    isProcessingQueue = true;
+
+    const operation = shapeOperationQueue.shift();
+
+    try {
+        if (operation.type === 'create') {
+            await prismaClient.shape.create({ data: operation.data });
+        } else if (operation.type === 'update') {
+            await prismaClient.shape.update({ where: { id: operation.data.id }, data: { shape: operation.data.shape } });
+        } else if (operation.type === 'delete') {
+            await prismaClient.shape.delete({ where: { id: operation.shapeId } });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    isProcessingQueue = false;
+    setImmediate(processShapeQueue);
+};
+
+
 const getUser = (userId: string) => {
     return users.get(userId);
 }
@@ -24,19 +52,11 @@ const removeConnection = (userId: string) => {
 
 const roomExists = async (roomId: string) => {
     try {
-        if (!roomId || typeof (roomId) !== 'string') {
-            return false;
-        }
-        const room = await prismaClient.room.findFirst({
-            where: { linkId: roomId }
-        })
-
-        if (!room) {
-            return false;
-        }
-        return true;
+        if (!roomId || typeof(roomId) !== 'string') return false;
+        const room = await prismaClient.room.findFirst({ where: { linkId: roomId } });
+        return !!room;
     } catch (error) {
-        console.log(error);
+        console.error("Error checking room existence:", error);
         return false;
     }
 }
@@ -62,138 +82,80 @@ const broadcastToRoom = (roomId: string, message: object) => {
 
 const joinRoom = async (userId: string, roomId: string) => {
     if (!await roomExists(roomId)) {
-        console.log(`Room ${roomId} doesn't exist`);
+        const user = getUser(userId);
+        if (user) user.ws.send(JSON.stringify({ type: 'roomNotFound' }));
         return;
     }
-
     const user = getUser(userId);
-    if (!user) {
-        console.log(`No user connection found for ID: ${userId}`);
-        return;
-    }
-
-    if (user.rooms.has(roomId)) {
-        console.log(`${user.username} is already in room ${roomId}`);
-        return;
-    }
+    if (!user || user.rooms.has(roomId)) return;
 
     user.rooms.add(roomId);
-    console.log(`${user.username} joined room ${roomId}`);
-
-    const join = {
-        type: 'joinRoom',
-        payload: {
-            username: user.username,
-            roomId,
-        }
-    };
-
-    const usersList = getParticipants(roomId);
-    const list = {
-        type: 'usersList',
-        payload: {
-            participants: usersList,
-            roomId,
-        }
-    };
-
-    broadcastToRoom(roomId, join);
-    broadcastToRoom(roomId, list);
+    broadcastToRoom(roomId, { type: 'joinRoom', payload: { username: user.username } });
+    broadcastToRoom(roomId, { type: 'usersList', payload: { participants: getParticipants(roomId) } });
 };
 
 const leaveRoom = async (userId: string, roomId: string) => {
     const user = getUser(userId);
-    if (!user || !user.rooms.has(roomId)) {
-        return;
-    }
-
+    if (!user || !user.rooms.has(roomId)) return;
     user.rooms.delete(roomId);
-    console.log(`${user.username} left room ${roomId}`);
-
-    const leave = {
-        type: 'leaveRoom',
-        payload: {
-            username: user.username,
-            roomId,
-        }
-    };
-
-    const usersList = getParticipants(roomId);
-    const list = {
-        type: 'usersList',
-        payload: {
-            participants: usersList,
-            roomId,
-        }
-    };
-
-    broadcastToRoom(roomId, leave);
-    broadcastToRoom(roomId, list);
+    broadcastToRoom(roomId, { type: 'leaveRoom', payload: { username: user.username } });
+    broadcastToRoom(roomId, { type: 'usersList', payload: { participants: getParticipants(roomId) } });
 };
 
 const createShape = async (userId: string, shape: Shape, roomId: string) => {
     if (!await roomExists(roomId)) return;
 
-    try {
-        await prismaClient.shape.create({
-            data: {
-                id: shape.id,
-                roomId,
-                userId,
-                shape,
-            }
-        });
+    broadcastToRoom(roomId, {
+        type: 'create',
+        payload: { shape }
+    });
 
-        broadcastToRoom(roomId, {
-            type: 'create',
-            payload: { shape, roomId }
-        });
-    } catch (error) {
-        console.error(`Error while creating shape`);
-    }
+    shapeOperationQueue.push({
+        type: 'create',
+        data: {
+            id: shape.id,
+            roomId,
+            userId,
+            shape,
+        }
+    });
+    
+    processShapeQueue();
 };
 
 const updateShape = async (userId: string, shape: Shape, roomId: string) => {
     if (!await roomExists(roomId)) return;
 
-    try {
-        await prismaClient.shape.update({
-            where: { id: shape.id },
-            data: { shape }
-        });
+    broadcastToRoom(roomId, {
+        type: 'update',
+        payload: { shape }
+    });
 
-        broadcastToRoom(roomId, {
-            type: 'update',
-            payload: { shape, roomId }
-        });
-    } catch (error: any) {
-        if (error.code === 'P2025') {
-            console.warn(`Attempted to update a shape with ID [${shape.id}] that does not exist. Skipping.`);
-        } else {
-            console.error(`An unexpected error occurred while updating shape [${shape.id}]:`, error);
+    shapeOperationQueue.push({
+        type: 'update',
+        data: {
+            id: shape.id,
+            shape: shape,
         }
-    }
+    });
+
+    processShapeQueue();
 };
 
 const deleteShape = async (userId: string, shapeId: string, roomId: string) => {
     if (!await roomExists(roomId)) return;
 
-    try {
-        await prismaClient.shape.delete({
-            where: { id: shapeId }
-        });
-
-        broadcastToRoom(roomId, {
-            type: 'delete',
-            payload: { shapeId, roomId }
-        });
-    } catch (error: any) {
-        if (error.code === 'P2025') {
-            console.warn(`Attempted to delete a shape with ID [${shapeId}] that does not exist. Skipping.`);
-        } else {
-            console.error(`An unexpected error occurred while updating shape [${shapeId}]:`, error);
-        }
-    }
+    broadcastToRoom(roomId, {
+        type: 'delete',
+        payload: { shapeId }
+    });
+    
+    shapeOperationQueue.push({
+        type: 'delete',
+        shapeId: shapeId,
+    });
+    
+    processShapeQueue();
 };
 
 export {

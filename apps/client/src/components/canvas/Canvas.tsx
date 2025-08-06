@@ -93,11 +93,11 @@ export default function Canvas() {
   const [showCollabPanel, setShowCollabPanel] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
-      joinRoom(roomId);
-    }
-  }, [mode, roomId, socketStatus, joinRoom]);
+  // useEffect(() => {
+  //   if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
+  //     joinRoom(roomId);
+  //   }
+  // }, [mode, roomId, socketStatus, joinRoom]);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -479,7 +479,7 @@ export default function Canvas() {
         {mode === 'solo' && <UndoRedo />}
         {mode === 'collaborative' && <div><button
           onClick={toggleCollaborationPanel}
-          className="fixed boottom-6 right-6 sm:bottom-6 sm:right-6 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
+          className="fixed bottom-6 right-6 sm:bottom-6 sm:right-6 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
         >
           <Users className="w-5 h-5" />
           <span className="hidden md:inline">View Participants</span>

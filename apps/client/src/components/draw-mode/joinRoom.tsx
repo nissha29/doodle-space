@@ -4,10 +4,12 @@ import { X } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import useSessionMode from "@/hooks/useSessionMode";
 
 export default function JoinRoom({ setJoinRoom }: any) {
   const [link, setLink] = useState("");
-  const { loading, joinRoom } = useSocket();
+  const { mode, roomId } = useSessionMode();
+  const { joinRoom } = useSocket();
 
   function getRoomIdFromLink() {
     try {
@@ -51,7 +53,7 @@ export default function JoinRoom({ setJoinRoom }: any) {
                 toast.error("Invalid room link. Please check the format.");
               }
             }}>
-              {loading ? "Joining..." : "Join Room"}
+              Join Room
             </Button>
           </div>
         </div>

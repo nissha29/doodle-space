@@ -6,13 +6,15 @@ import { nanoid } from "nanoid";
 import { createRoom } from "@/api/room";
 import toast from "react-hot-toast";
 import useSocket from "@/hooks/useSocket";
+import useSessionMode from "@/hooks/useSessionMode";
 
 export default function CreateRoom({ setCreateRoom }: any) {
   const [roomLink, setRoomLink] = useState("");
   const [isCopied, setIsCopied] = useState(false);
   const [isRoomCreated, setIsRoomCreated] = useState(false);
   const [loader, setLoader] = useState(false);
-  const { loading, joinRoom } = useSocket();
+  const { mode, roomId } = useSessionMode();
+  const { joinRoom } = useSocket();
 
   const generateRoomLink = async () => {
     try {
@@ -93,7 +95,7 @@ export default function CreateRoom({ setCreateRoom }: any) {
                   }}
                   className=""
                 >
-                  {loading ? "Joining..." : "Join Room"}
+                  Join Room
                 </Button>
               </div>
             </div> : <div className="flex flex-col gap-4">

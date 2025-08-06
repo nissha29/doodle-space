@@ -30,16 +30,16 @@ export default function () {
           <div className="flex justify-center items-center">
             <div className="text-2xl sm:text-3xl font-semibold">ძƦ⩜Ꮤ, ძထძℓꫀ, ძꫀᦓℹ𝔤ᥒ</div>
           </div>
-          <div className="flex flex-col border border-neutral-700 rounded-2xl mt-20 p-6 sm:p-12 bg-neutral-900/20">
+          <div className="flex flex-col border border-neutral-700 rounded-2xl mt-6 p-6 sm:p-12 bg-neutral-900/20">
             <div className="text-2xl sm:text-3xl text-white mb-8">
               Select Mode
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               <SelectMode type="draw" href="/canvas"/>
               <SelectMode type="join" onClick={() => setJoinRoom(true)}/>
               <SelectMode type="create" onClick={() => setCreateRoom(true)}/>
-              <SelectMode type="play" href="/play"/>
+              {/* <SelectMode type="play" href="/play"/> */}
             </div>
           </div>
         </div>

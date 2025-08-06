@@ -1,10 +1,12 @@
+import useSessionMode from "@/hooks/useSessionMode";
 import useUndoRedo from "@/hooks/useUndoRedo";
 import { Redo, Undo } from "@/icons/icons";
 
 export function UndoRedo() {
     const { undo, redo } = useUndoRedo();
+    const { mode } = useSessionMode();
   return (
-    <div className="fixed bottom-6 left-10">
+    <div className={`absolute bottom-6 left-6`}>
       <div className="bg-neutral-800/60 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden">
         <div className="flex items-center">
           <button

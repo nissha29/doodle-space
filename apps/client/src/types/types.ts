@@ -68,3 +68,8 @@ export enum SocketStatus {
   'connected',
   'disconnected',
 }
+
+export interface SocketStatusStore {
+  socketStatus: SocketStatus,
+  setSocketStatus: (status: SocketStatus) => void,
+}

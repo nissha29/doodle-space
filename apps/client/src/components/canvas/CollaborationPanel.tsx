@@ -42,7 +42,7 @@ export function CollaborationPanel({ isVisible, onClose }: CollaborationPanelPro
   if (!isVisible) return null;
 
   return (
-    <div className="absolute right-4 bottom-20 sm:right-6 bg-neutral-900/90 bg-opacity-80 backdrop-blur-md p-4 rounded-lg shadow-2xl border border-neutral-800 text-white w-52 sm:w-64 animate-in fade-in duration-200">
+    <div className="z-10 absolute right-20 bottom-20 sm:right-24 bg-neutral-900/90 bg-opacity-80 backdrop-blur-md p-4 rounded-lg shadow-2xl border border-neutral-800 text-white w-52 sm:w-64 animate-in fade-in duration-200">
 
       <button
         onClick={onClose}
@@ -91,7 +91,7 @@ export function CollaborationPanel({ isVisible, onClose }: CollaborationPanelPro
             toast.error("Invalid room link. Please check the format.");
           }
         }}
-        className="w-full bg-red-500/70 hover:bg-red-500 transition-colors text-white py-2 px-4 rounded-lg hover:cursor-pointer"
+        className="w-full bg-rose-400 hover:bg-rose-500 transition-colors text-white py-2 px-4 rounded-lg hover:cursor-pointer"
       >
         Leave Room
       </button>

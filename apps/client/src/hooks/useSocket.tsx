@@ -16,17 +16,24 @@ let connectionQueue: (() => void)[] = [];
 let isConnecting = false;
 
 const connect = (
-  token: string | null,
+  roomId: string | null,
   setSocketStatus: (status: SocketStatus) => void
 ) => {
-  if(!token) return;
+  const token = localStorage.getItem('token');
+
+  if (!token || !roomId) return;
   if (wsInstance || isConnecting) {
     return;
   }
   isConnecting = true;
   setSocketStatus(SocketStatus.connecting);
 
-  const wsUrl = `${WS_URL}?token=${token}`;
+  let wsUrl = `${WS_URL}?token=${token}`;
+
+  if (roomId) {
+    wsUrl += `&roomId=${roomId}`;
+  }
+
   const ws = new WebSocket(wsUrl);
   wsInstance = ws;
 
@@ -61,11 +68,11 @@ export default function useSocket() {
   const router = useRouter();
   const { setParticipants } = useParticipantStore();
   const { socketStatus, setSocketStatus } = useSocketStatusStore();
+  const { roomId } = useSessionMode();
   const pathname = usePathname();
-  const { mode, roomId } = useSessionMode();
 
   useEffect(() => {
-    const ws = connect(localStorage.getItem('token'), setSocketStatus);
+    const ws = connect(roomId, setSocketStatus);
 
     if (ws) {
 
@@ -75,8 +82,15 @@ export default function useSocket() {
           const { type, payload } = data;
 
           switch (type) {
+            case 'roomNotFound':
+              toast.error('Room not found');
+              router.push('/room-not-found');
+              break;
             case 'joinRoom':
               toast.success(`${payload.username} has joined room`);
+              if (pathname !== `/canvas/room/${roomId}`) {
+                router.push(`/canvas/room/${roomId}`);
+              }
               break;
             case 'leaveRoom':
               toast.error(`${payload.username} has left the room`);
@@ -106,34 +120,31 @@ export default function useSocket() {
   const sendMessage = (type: string, payload: any) => {
     const action = () => {
       if (wsInstance?.readyState === WebSocket.OPEN) {
+        console.log('sending msg');
         wsInstance.send(JSON.stringify({ type, payload }));
       }
     };
 
     if (wsInstance?.readyState === WebSocket.OPEN) {
+      console.log('sending join msg here');
       action();
     } else {
+      console.log('pushing join msg in queue')
       connectionQueue.push(action);
       if (!wsInstance && !isConnecting) {
-        connect(localStorage.getItem('token'), setSocketStatus);
+        connect(roomId, setSocketStatus);
       }
     }
   };
 
-  const joinRoom = (roomId: string) => {
+  const joinRoom = useCallback((roomId: string) => {
+    console.log('inside join room');
     sendMessage('joinRoom', { roomId });
 
     if (pathname !== `/canvas/room/${roomId}`) {
       router.push(`/canvas/room/${roomId}`);
     }
-  };
-
-  useEffect(() => {
-      if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
-        joinRoom(roomId);
-      }
-    }, [mode, roomId, socketStatus, joinRoom]);
-
+  }, [pathname, router]);
 
   const leaveRoom = useCallback((roomId: string) => {
     sendMessage('leaveRoom', { roomId });
@@ -155,6 +166,7 @@ export default function useSocket() {
 
   return {
     socketStatus,
+    connect,
     joinRoom,
     leaveRoom,
     createShape,

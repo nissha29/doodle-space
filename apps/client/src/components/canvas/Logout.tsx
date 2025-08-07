@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function Logout() {
   const router  = useRouter();
-    return <div className={`absolute bottom-6 right-6`}>
+    return <div className={`absolute bottom-6 left-6`}>
           <button
             onClick={() => {
               localStorage.removeItem('token');

@@ -25,7 +25,7 @@ const processShapeQueue = async () => {
             await prismaClient.shape.delete({ where: { id: operation.shapeId } });
         }
     } catch (error) {
-        console.log(error);
+        console.log('error');
     }
 
     isProcessingQueue = false;
@@ -81,6 +81,7 @@ const broadcastToRoom = (roomId: string, message: object) => {
 };
 
 const joinRoom = async (userId: string, roomId: string) => {
+    console.log('joining room');
     if (!await roomExists(roomId)) {
         const user = getUser(userId);
         if (user) user.ws.send(JSON.stringify({ type: 'roomNotFound' }));
@@ -90,6 +91,7 @@ const joinRoom = async (userId: string, roomId: string) => {
     if (!user || user.rooms.has(roomId)) return;
 
     user.rooms.add(roomId);
+    console.log(user.rooms);
     broadcastToRoom(roomId, { type: 'joinRoom', payload: { username: user.username } });
     broadcastToRoom(roomId, { type: 'usersList', payload: { participants: getParticipants(roomId) } });
 };

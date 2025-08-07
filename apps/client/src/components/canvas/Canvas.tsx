@@ -37,6 +37,7 @@ import { CollaborationPanel } from "./CollaborationPanel";
 import { Loader2, LogOut, Users } from "lucide-react";
 import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
+import Logout from "./Logout";
 
 function getInitialShapes(): Shape[] {
   const rawCanvas = localStorage.getItem('current-canvas');
@@ -86,18 +87,12 @@ export default function Canvas() {
   const [panOffset, setPanOffset] = useState<Dimension>({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState<Dimension | null>(null);
   const { mode, roomId } = useSessionMode();
-  const { createShape, updateShape, deleteShape, joinRoom, socketStatus } = useSocket();
+  const { createShape, updateShape, deleteShape, socketStatus } = useSocket();
   const shapes = useShapeStore((s) => s.shapes);
   const setShapes = useShapeStore((s) => s.setShapes);
   const [hasMoved, setHasMoved] = useState(false);
   const [showCollabPanel, setShowCollabPanel] = useState(false);
   const router = useRouter();
-
-  // useEffect(() => {
-  //   if (mode === "collaborative" && roomId && socketStatus === SocketStatus.connected) {
-  //     joinRoom(roomId);
-  //   }
-  // }, [mode, roomId, socketStatus, joinRoom]);
 
   useLayoutEffect(() => {
     function resizeCanvas() {
@@ -428,23 +423,6 @@ export default function Canvas() {
     setShowCollabPanel(false);
   };
 
-  if (mode === 'collaborative' && socketStatus !== SocketStatus.connected) {
-    return (
-      <div className="w-screen h-screen flex flex-col items-center justify-center bg-neutral-900 text-white gap-4">
-        <Loader2 className="w-12 h-12 animate-spin text-cyan-400" />
-        <p className="text-lg text-neutral-300">
-          {socketStatus === SocketStatus.connecting ? 'Connecting to the canvas...' : 'Connection lost.'}
-        </p>
-        {socketStatus === SocketStatus.disconnected && (
-          <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-cyan-600 rounded-md">
-            Retry Connection
-          </button>
-        )}
-      </div>
-    );
-  }
-
-
   return (
     <div className="relative overflow-y-hidden w-full h-full">
       <canvas
@@ -476,7 +454,7 @@ export default function Canvas() {
         <SelectTool />
       </div>
       <div>
-        {mode === 'solo' && <UndoRedo />}
+        {mode === 'solo' ? <UndoRedo /> : <Logout />}
         {mode === 'collaborative' && <div><button
           onClick={toggleCollaborationPanel}
           className="fixed bottom-6 right-6 sm:bottom-6 sm:right-6 bg-neutral-700/60 hover:bg-neutral-800 hover:cursor-pointer text-white tracking-wider p-3 rounded-lg shadow-lg transition-colors flex items-center gap-2"
@@ -490,19 +468,6 @@ export default function Canvas() {
             onClose={closeCollaborationPanel}
           />
         </div>}
-        <div className="absolute bottom-6 left-6">
-          <button
-            onClick={() => {
-              localStorage.removeItem('token');
-              useUserStore.getState().setUser({ name: '', email: '' });
-              router.push('/signin')
-            }}
-            className="group flex items-center gap-2.5 rounded-lg bg-neutral-700/60 px-3 py-2 text-base text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:bg-rose-500 hover:text-white hover:cursor-pointer"
-          >
-            <span>Logout</span>
-            <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-          </button>
-        </div>
       </div>
     </div >
   );

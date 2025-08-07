@@ -14,6 +14,7 @@ wss.on('connection', async function connection(ws, request) {
 
   const queryParams = new URLSearchParams(url.split('?')[1]);
   const token = queryParams.get('token') || '';
+  const roomId = queryParams.get('roomId') || null;
 
   const userId = authUser(token);
   if (!userId) {
@@ -28,8 +29,15 @@ wss.on('connection', async function connection(ws, request) {
     return;
   }
 
+  console.log("roomId - " + roomId);
+
   addConnection(ws, userId, user?.name);
   console.log(`New connection established for user: ${user.name} with ID: ${userId}`);
+
+  if(roomId){
+    console.log('join');
+    joinRoom(userId, roomId);
+  }
 
   ws.on('close', () => {
     const user = getUser(userId); 

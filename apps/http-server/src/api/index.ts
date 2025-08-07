@@ -1,6 +1,6 @@
 import express, { Express } from 'express'
-import userRouter from './routers/user.route.js';
-import roomRouter from './routers/room.route.js';
+import userRouter from '../routers/user.route.js';
+import roomRouter from '../routers/room.route.js';
 import dotenv from 'dotenv'
 import cors from 'cors'
 
@@ -23,7 +23,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 app.use(express.json());
 dotenv.config();
 

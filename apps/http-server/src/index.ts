@@ -1,12 +1,29 @@
-import express from 'express'
+import express, { Express } from 'express'
 import userRouter from './routers/user.route.js';
 import roomRouter from './routers/room.route.js';
 import dotenv from 'dotenv'
 import cors from 'cors'
 
-const app = express();
+const app: Express = express();
+const allowedOrigins = [
+  'http://localhost:3002', 
+  'https://dooodle-space.vercel.app' 
+];
+
+const corsOptions = {
+  origin: function (origin: any, callback: any) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+  allowedHeaders: ['Content-Type', 'authorization'] 
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
 dotenv.config();
 
 app.get('/', (req, res) => {
@@ -19,3 +36,5 @@ app.use('/room', roomRouter);
 app.listen(8000, () => {
     console.log(`Server Started`)
 });
+
+export default app;

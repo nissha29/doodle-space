@@ -29,8 +29,8 @@ export function Footer() {
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
                 <div className="lg:text-2xl sm:text-3xl">
-                    ძထძℓꫀ
-                    <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραсꫀ</span>
+                    ძထძℓ౿
+                    <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραс౿</span>
                 </div>
             
                 <div className="flex gap-3 mt-4 md:mt-0">

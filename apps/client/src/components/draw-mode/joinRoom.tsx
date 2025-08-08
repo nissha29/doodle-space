@@ -27,7 +27,7 @@ export default function JoinRoom({ setJoinRoom }: any) {
       onClick={() => setJoinRoom(false)}
     >
       <div className="relative" onClick={(e) => e.stopPropagation()}>
-        <div className="border border-neutral-800 p-4 w-96 h-72 flex flex-col gap-10 rounded-2xl bg-neutral-900/80 backdrop-blur-md shadow-2xl">
+        <div className="border border-neutral-800 p-4 w-72 sm:p-6 sm:w-96 h-72 flex flex-col gap-10 rounded-2xl bg-neutral-900/80 backdrop-blur-md shadow-2xl">
           <div className="flex justify-between items-center">
             <div className="text-3xl text-white">Join Room</div>
             <div
@@ -45,7 +45,7 @@ export default function JoinRoom({ setJoinRoom }: any) {
               value={link}
               onChange={(e) => setLink(e.target.value)}
             />
-            <Button onClick={() => {
+            <Button className={`sm:w-full`} onClick={() => {
               const roomId = getRoomIdFromLink();
               if (roomId) {
                 joinRoom(roomId);

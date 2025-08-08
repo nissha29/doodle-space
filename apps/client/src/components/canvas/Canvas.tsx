@@ -34,8 +34,7 @@ import { useShapeStore } from "@/store/useShapeStore";
 import { getExistingShapes } from "@/api/room";
 import toast from "react-hot-toast";
 import { CollaborationPanel } from "./CollaborationPanel";
-import { Loader2, LogOut, Users } from "lucide-react";
-import { useUserStore } from "@/store/useUserStore";
+import { Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Logout from "./Logout";
 
@@ -206,9 +205,9 @@ export default function Canvas() {
     }
 
     if (
-      action === "draw" &&
-      activeTool === "pencil" &&
-      currentPoints.length > 0
+      action === "draw" && 
+      activeTool === "pencil" &&  
+      currentPoints.length > 0 
     ) {
       freeDraw(ctx, currentPoints, panOffset);
 
@@ -424,7 +423,7 @@ export default function Canvas() {
   };
 
   return (
-    <div className="relative overflow-y-hidden w-full h-full">
+    <div className="relative overflow-y-hidden w-full h-screen">
       <canvas
         ref={canvasRef}
         width={1920}
@@ -446,8 +445,8 @@ export default function Canvas() {
 
       <div className="absolute top-6 left-6">
         <div className="text-2xl sm:text-3xl">
-          ძထძℓꫀ
-          <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραсꫀ</span>
+          ძထძℓ౿
+          <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">ᦓραс౿</span>
         </div>
       </div>
       <div className="fixed top-6 right-6 z-20">

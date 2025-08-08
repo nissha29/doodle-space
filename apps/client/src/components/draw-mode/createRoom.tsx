@@ -52,7 +52,7 @@ export default function CreateRoom({ setCreateRoom }: any) {
         className="relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border border-neutral-800 p-6 w-96 min-h-72 flex flex-col gap-6 rounded-2xl bg-neutral-900/90 backdrop-blur-md shadow-2xl">
+        <div className="border border-neutral-800 p-4 w-72 sm:p-6 sm:w-96 min-h-72 flex flex-col gap-6 rounded-2xl bg-neutral-900/90 backdrop-blur-md shadow-2xl">
           <div className="flex justify-between items-center">
             <div className="text-2xl text-white font-semibold">Create New Room</div>
             <div
@@ -72,11 +72,11 @@ export default function CreateRoom({ setCreateRoom }: any) {
                     label="Room Link Generated"
                     value={roomLink}
                     readOnly
-                    className="flex-1 bg-neutral-800 border-neutral-700 text-neutral-200"
+                    className="flex-1 bg-neutral-800 border-neutral-700 text-neutral-200 w-52 sm:w-72"
                   />
                   <Button
                     onClick={copyToClipboard}
-                    className="px-4 py-3 mt-9 bg-neutral-200 hover:bg-neutral-300 border border-neutral-600"
+                    className="px-1 py-3 mt-9 bg-neutral-200 hover:bg-neutral-300 border border-neutral-600 flex justify-center items-center"
                   >
                     {isCopied ? <Check className="w-4 h-4 text-green-700" /> : <Copy className="w-4 h-4" />}
                   </Button>

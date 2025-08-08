@@ -17,7 +17,7 @@ export default function () {
       <div className="px-5 lg:px-10 py-6 w-full h-full">
         <div className="flex justify-between items-center">
           <div className="text-2xl sm:text-3xl">
-            ძထძℓꫀ
+            ძထძℓ౿
             <span className="px-1.5 py-0.5 rounded-xl text-cyan-400">
               ᦓραсꫀ
             </span>
@@ -28,7 +28,7 @@ export default function () {
         </div>
         <div className="flex justify-center items-center mt-28 flex-col">
           <div className="flex justify-center items-center">
-            <div className="text-2xl sm:text-3xl font-semibold">ძƦ⩜Ꮤ, ძထძℓꫀ, ძꫀᦓℹ𝔤ᥒ</div>
+            <div className="text-2xl sm:text-3xl font-semibold">ძƦ⩜Ꮤ, ძထძℓ౿, ძ౿ᦓℹ𝔤ᥒ</div>
           </div>
           <div className="flex flex-col border border-neutral-700 rounded-2xl mt-6 p-6 sm:p-12 bg-neutral-900/20">
             <div className="text-2xl sm:text-3xl text-white mb-8">

@@ -48,7 +48,7 @@ export default function Hero() {
                 </div>
                 <div className="flex flex-col justify-center items-center gap-4 sm:gap-8 mt-14">
                   <div className="2xl:w-6xl text-4xl sm:text-5xl md:text-6xl text-center tracking-wider leading-14 sm:leading-24 xl:px-0 lg:px-8 md:px-6">
-                    Every <span className="text-cyan-400">ძထძℓꫀ</span> begins with a
+                    Every <span className="text-cyan-400">ძထძℓ౿</span> begins with a
                     spark illuminating creativity
                   </div>
                   <div className="text-xl xl:text-2xl md:w-2xl lg:w-3xl text-center text-white/60">

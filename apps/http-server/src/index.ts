@@ -1,6 +1,6 @@
 import express, { Express } from 'express'
-import userRouter from '../routers/user.route.js';
-import roomRouter from '../routers/room.route.js';
+import userRouter from './routers/user.route.js';
+import roomRouter from './routers/room.route.js';
 import dotenv from 'dotenv'
 import cors from 'cors'
 

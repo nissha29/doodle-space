@@ -194,9 +194,6 @@ importers:
 
   packages/common:
     dependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
       zod:
         specifier: ^3.25.67
         version: 3.25.76
@@ -204,6 +201,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   packages/eslint-config:
     devDependencies:

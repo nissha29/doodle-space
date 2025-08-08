@@ -1,23 +1,29 @@
 {
   "name": "@repo/common",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "description": "",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./types": "./src/types.ts"
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "typescript": "^5.8.3",
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
-  }
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

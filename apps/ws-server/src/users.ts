@@ -30,7 +30,7 @@ const processShapeQueue = async () => {
 
     isProcessingQueue = false;
     setImmediate(processShapeQueue);
-};7
+};
 
 
 const getUser = (userId: string) => {

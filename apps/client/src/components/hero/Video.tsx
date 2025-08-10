@@ -11,13 +11,16 @@ export default function Video() {
           </div>
 
         </div>
-        <video
-          src="/doodle.mp4"
-          controls
-          width={1200}
-          height={1200}
-          className="rounded-xl sm:rounded-4xl p-1 lg:p-3 mt-16 w-full h-full"
-        />
+        <div className="w-full max-w-5xl mt-16 aspect-video rounded-xl lg:rounded-4xl overflow-hidden">
+          <iframe
+            src="https://www.youtube.com/embed/Bw6PRJb1gDs" 
+            title="Doodle Space Demo Video"
+            frameBorder="3"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="2xl:w-7xl xl:w-4xl lg:w-3xl md:w-xl sm:w-lg w-80 h-full" 
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,135 +1,83 @@
-# Turborepo starter
+# 🎨 Doodle Space
 
-This Turborepo starter is maintained by the Turborepo core team.
+### A blazingly fast, intuitive, and collaborative digital canvas for your ideas. Doodle Space is where creativity meets simplicity.
 
-## Using this example
+![Alt Text](./assets/landingPage.png)
 
-Run the following command:
+![Alt Text](./assets/landingPage2.png)
 
-```sh
-npx create-turbo@latest
-```
+![Alt Text](./assets/canvas.png)
 
-## What's inside?
+![Alt Text](./assets/draw-mode.png)
 
-This Turborepo includes the following packages/apps:
+![Alt Text](./assets/collab.png)
 
-### Apps and Packages
+## ✨ Key Features
+🌐 **Infinite Canvas**: Never run out of space. Pan and zoom freely to give your ideas the room they need to grow.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+🤝 **Seamless Real-Time Collaboration**: Sign up for a free account, create a room, and share the link. Brainstorm with your team, classmates, or friends in perfect sync.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+✏️ **Complete Drawing Toolkit**: Go from concept to creation with essential tools: Pencil, Eraser, Selection, Pan, and Shapes (Rectangle, Circle, Diamond, Line, Arrow).
 
-### Utilities
+👆 **Total Control Over Elements**: Easily select, move, and resize any object on the canvas. Multi-level undo and redo are always at your fingertips.
 
-This Turborepo has some additional tools already setup for you:
+🚪 **Flexible Rooms**: Create dedicated, private rooms for your projects. You can work solo or invite others to join your session.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+🚀 **Built for Speed**: No lag, no friction. Just a smooth, responsive drawing experience that lets you focus on what matters.
 
-### Build
+## Demo Video
 
-To build all apps and packages, run the following command:
+[![Doodle Space Demo Video](https://img.youtube.com/vi/Bw6PRJb1gDs/maxresdefault.jpg)](https://www.youtube.com/watch?v=Bw6PRJb1gDs)
 
-```
-cd my-turborepo
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+## 🛠️ Tech Stack
+Doodle Space is built with a modern, scalable, and efficient technology stack to ensure the best performance and user experience.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+- Next.js 
+- Rough.js 
+- Turborepo 
+- Prisma 
+- Websockets 
+- Express.js 
+- Typescript 
+- Zustand
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## 🚀 Getting Started
+Ready to run Doodle Space locally? Follow these simple steps.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### Prerequisites
+Ensure you have Node.js (v18 or later) and pnpm installed on your machine.
 
-### Develop
+#### Installation
+Clone the Repository
 
-To develop all apps and packages, run the following command:
+```git clone https://github.com/your-username/doodle-space.git```
 
-```
-cd my-turborepo
+#### Navigate to the Directory
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+```cd doodle-space```
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+#### Install Dependencies
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+```pnpm install```
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+#### Run the Development Server
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+```pnpm run dev```
 
-### Remote Caching
+#### Open http://localhost:3002 in your browser to see the result.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## 🙌 Contributing
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+- Fork the Project
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- Create your Feature Branch (git checkout -b feature/AmazingFeature)
 
-```
-cd my-turborepo
+- Commit your Changes (git commit -m 'Add some AmazingFeature')
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+- Push to the Branch (git push origin feature/AmazingFeature)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+- Open a Pull Request
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)

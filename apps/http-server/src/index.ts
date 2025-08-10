@@ -7,7 +7,9 @@ import cors from 'cors'
 const app: Express = express();
 const allowedOrigins = [
   'http://localhost:3002', 
-  'https://dooodle-space.vercel.app' 
+  'https://dooodle-space.vercel.app', 
+  'https://doodlespace.xyz',
+  'https://www.doodlespace.xyz'
 ];
 
 const corsOptions = {

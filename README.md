@@ -52,7 +52,7 @@ Ensure you have Node.js (v18 or later) and pnpm installed on your machine.
 #### Installation
 Clone the Repository
 
-```git clone https://github.com/your-username/doodle-space.git```
+```git clone https://github.com/nissha29/doodle-space.git```
 
 #### Navigate to the Directory
 
@@ -80,4 +80,3 @@ Contributions are what make the open-source community such an amazing place to l
 - Push to the Branch (git push origin feature/AmazingFeature)
 
 - Open a Pull Request
-
